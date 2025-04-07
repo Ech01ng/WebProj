@@ -180,6 +180,102 @@ nav ul li a:hover {
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
+/* Register Form */
+.register-container {
+    max-width: 400px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+}
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.register-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}   
+
+.register-form .form-control {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}   
+
+.register-form .btn-primary {
+    background-color: #3498db;
+    color: white;
+}   
+
+.register-form .btn-primary:hover {
+    background-color: #2980b9;
+}
+
+/* Contact Form */
+.contact-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #1a1a1a;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    color: white;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.contact-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+}
+
+.contact-form .form-group label {
+    color: white;
+    font-weight: 500;
+}
+
+.contact-form .form-control {
+    padding: 0.75rem;
+    border: 1px solid #333;
+    border-radius: 4px;
+    background-color: #1a1a1a;
+    color: white;
+}
+
+.contact-form textarea.form-control {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.contact-form .btn-primary {
+    background-color: #3498db;
+    color: white;
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
+}
+
+.contact-form .btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.contact-form .form-control:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
 /* Footer */
 footer {
     background-color: #2c3e50;
@@ -209,6 +305,11 @@ footer {
 .footer-section ul li a {
     color: white;
     text-decoration: none;
+}
+
+.footer-section ul li a:hover {
+    transition: color 0.3s ease;
+    color: #3498db;
 }
 
 .footer-bottom {
