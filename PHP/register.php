@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $errors = [];
     
     // Check if username exists
-    $sql = "SELECT user_id FROM users WHERE username = ?";
+    $sql = "SELECT id FROM users WHERE username = ?";
     if($stmt = mysqli_prepare($conn, $sql)) {
         mysqli_stmt_bind_param($stmt, "s", $username);
         if(mysqli_stmt_execute($stmt)) {
@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     
     // Check if email exists
-    $sql = "SELECT user_id FROM users WHERE email = ?";
+    $sql = "SELECT id FROM users WHERE email = ?";
     if($stmt = mysqli_prepare($conn, $sql)) {
         mysqli_stmt_bind_param($stmt, "s", $email);
         if(mysqli_stmt_execute($stmt)) {

@@ -2,58 +2,68 @@
 CREATE DATABASE IF NOT EXISTS pharmacy_db;
 USE pharmacy_db;
 
--- Users table
+-- Create users table
 CREATE TABLE users (
-    user_id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) UNIQUE NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    role ENUM('admin', 'user') DEFAULT 'user',
+    role VARCHAR(20) DEFAULT 'user',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Categories table
+-- Create products table
+CREATE TABLE products (
+    product_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    price DECIMAL(10,2) NOT NULL,
+    category VARCHAR(50),
+    image_url VARCHAR(255),
+    stock INT NOT NULL DEFAULT 0
+);
+
+-- Create categories table
 CREATE TABLE categories (
-    category_id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
     description TEXT
 );
 
--- Products table
-CREATE TABLE products (
-    product_id INT PRIMARY KEY AUTO_INCREMENT,
-    category_id INT,
-    name VARCHAR(200) NOT NULL,
-    description TEXT,
-    price DECIMAL(10,2) NOT NULL,
-    stock_quantity INT NOT NULL,
-    image_url VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories(category_id)
-);
-
--- Orders table
+-- Create orders table
 CREATE TABLE orders (
-    order_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT,
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
     total_amount DECIMAL(10,2) NOT NULL,
-    status ENUM('pending', 'processing', 'completed', 'cancelled') DEFAULT 'pending',
+    status VARCHAR(20) NOT NULL DEFAULT 'pending',
+    billing_address TEXT NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    card_number VARCHAR(255) NOT NULL,
+    card_expiry VARCHAR(10) NOT NULL,
+    card_cvv VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- Order items table
+-- Create order_items table
 CREATE TABLE order_items (
-    order_item_id INT PRIMARY KEY AUTO_INCREMENT,
-    order_id INT,
-    product_id INT,
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
     quantity INT NOT NULL,
     price DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(order_id),
     FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
 
--- Insert sample data
+-- Insert sample products
+INSERT INTO products (name, description, price, category, image_url, stock) VALUES
+('Vitamin C 1000mg', 'High-strength vitamin C supplement', 19.99, 'Vitamins', 'images/PJarr.png', 100),
+('Pain Relief Tablets 500mg', 'Effective pain relief medication', 12.99, 'Pain Relief', 'images/PPill.png', 150),
+('First Aid Kit', 'Complete first aid kit for emergencies', 29.99, 'Medical Supplies', 'images/PAid.png', 50),
+('Hand Sanitizer 500ml', 'Antibacterial hand sanitizer', 8.99, 'Personal Care', 'images/PHand.png', 200);
+
+-- Insert sample categories
 INSERT INTO categories (name, description) VALUES
 ('Prescription Medicines', 'Medicines that require a prescription'),
 ('Over-the-Counter', 'Medicines available without prescription'),

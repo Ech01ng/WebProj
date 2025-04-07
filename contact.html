@@ -15,8 +15,9 @@
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="products.html">Products</a></li>
-                <li><a href="login.html">Login</a></li>
-                <li><a href="register.html">Register</a></li>
+                <li id="loginLink"><a href="login.html">Login</a></li>
+                <li id="registerLink"><a href="register.html">Register</a></li>
+                <li id="logoutLink"><a href="PHP/login.php?action=logout">Logout</a></li>
             </ul>
         </nav>
     </header>
@@ -86,10 +87,9 @@
                 !5e3 = Hybrid view (satellite with roads and labels)
                 -->
                 <iframe 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6632.972295011595!2d-38.46244675566269!3d72.57935729656357!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4ea1753703a8e829%3A0x32a74cad76c0526b!2sSummit%20Camp!5e1!3m2!1sen!2sus!4v1709838431813!5m2!1sen!2sus"
-                    width="100%" 
-                    height="450" 
-                    style="border:0;" 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6632.972295011595!2d-38.46244675566269!3d72.57935729656357!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4ea1753703a8e829%3A0x32a74cad76c0526b!2sSummit%20Camp!5e1!3m2!1sen!2sus!4v1709838431813!5m2!1sen!2sus" 
+                    class="map-iframe"
+                    title="Nebris Pharmacy Location Map"
                     allowfullscreen>
                 </iframe>
             </div>
@@ -125,5 +125,8 @@
             </div>
         </div>
     </footer>
+
+    <!--- JS --->
+    <script src="JS/login.js"></script>
 </body>
 </html> 

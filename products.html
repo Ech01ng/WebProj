@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products - Nebris Pharmacy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="CSS/style.css">
 </head>
 <body>
@@ -12,11 +13,12 @@
             <div class="logo">
                 <h1>Nebris Pharmacy</h1>
             </div>
-            <ul>
+            <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="products.html">Products</a></li>
-                <li><a href="login.html">Login</a></li>
-                <li><a href="register.html">Register</a></li>
+                <li><a href="login.html" id="loginLink">Login</a></li>
+                <li><a href="register.html" id="registerLink">Register</a></li>
+                <li><a href="#" id="logoutLink" style="display: none;">Logout</a></li>
             </ul>
         </nav>
     </header>
@@ -25,7 +27,8 @@
         <div class="products-header">
             <h1>Our Products</h1>
             <div class="filter-section">
-                <select id="category-filter" class="form-control">
+                <label for="category-filter">Filter by Category:</label>
+                <select id="category-filter" class="form-control" title="Select product category">
                     <option value="">All Categories</option>
                     <option value="1">Prescription Medicines</option>
                     <option value="2">Over-the-Counter</option>
@@ -45,7 +48,7 @@
                     <h3 class="product-title">Vitamin C 1000mg</h3>
                     <p class="product-category">Vitamins and Supplements</p>
                     <p class="product-price">$19.99</p>
-                    <a href="product.html?id=1" class="btn btn-primary">View Details</a>
+                    <button onclick="addToCart(1)" class="add-to-cart-btn">Add to Cart</button>
                 </div>
             </div>
 
@@ -56,7 +59,7 @@
                     <h3 class="product-title">Pain Relief Tablets</h3>
                     <p class="product-category">Over-the-Counter</p>
                     <p class="product-price">$12.99</p>
-                    <a href="product.html?id=2" class="btn btn-primary">View Details</a>
+                    <button onclick="addToCart(2)" class="add-to-cart-btn">Add to Cart</button>
                 </div>
             </div>
 
@@ -67,7 +70,7 @@
                     <h3 class="product-title">First Aid Kit</h3>
                     <p class="product-category">Medical Supplies</p>
                     <p class="product-price">$29.99</p>
-                    <a href="product.html?id=3" class="btn btn-primary">View Details</a>
+                    <button onclick="addToCart(3)" class="add-to-cart-btn">Add to Cart</button>
                 </div>
             </div>
 
@@ -78,7 +81,7 @@
                     <h3 class="product-title">Hand Sanitizer</h3>
                     <p class="product-category">Personal Care</p>
                     <p class="product-price">$8.99</p>
-                    <a href="product.html?id=4" class="btn btn-primary">View Details</a>
+                    <button onclick="addToCart(4)" class="add-to-cart-btn">Add to Cart</button>
                 </div>
             </div>
 
@@ -89,7 +92,7 @@
                     <h3 class="product-title">Multivitamins</h3>
                     <p class="product-category">Vitamins and Supplements</p>
                     <p class="product-price">$24.99</p>
-                    <a href="product.html?id=5" class="btn btn-primary">View Details</a>
+                    <button onclick="addToCart(5)" class="add-to-cart-btn">Add to Cart</button>
                 </div>
             </div>
 
@@ -100,7 +103,7 @@
                     <h3 class="product-title">Blood Pressure Monitor</h3>
                     <p class="product-category">Medical Supplies</p>
                     <p class="product-price">$49.99</p>
-                    <a href="product.html?id=6" class="btn btn-primary">View Details</a>
+                    <button onclick="addToCart(6)" class="add-to-cart-btn">Add to Cart</button>
                 </div>
             </div>
         </div>
@@ -144,5 +147,32 @@
             </div>
         </div>
     </footer>
+
+    <div id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-sidebar-header">
+            <h3>Shopping Cart</h3>
+            <button id="close-cart-sidebar" class="close-cart-btn">&times;</button>
+        </div>
+        <div id="cart-sidebar-items" class="cart-sidebar-items">
+            <!-- Cart items will be loaded here -->
+        </div>
+        <div class="cart-sidebar-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-sidebar-total">$0.00</span>
+            </div>
+            <a href="cart.html" class="btn btn-primary">View Cart</a>
+        </div>
+    </div>
+
+    <div id="cart-sidebar-overlay" class="cart-sidebar-overlay"></div>
+    <div id="cart-icon" class="cart-icon">
+        <span class="cart-count">0</span>
+        <i class="fas fa-shopping-cart"></i>
+    </div>
+
+    <!--- JS --->
+    <script src="JS/login.js"></script>
+    <script src="JS/cart-sidebar.js"></script>
 </body>
 </html> 

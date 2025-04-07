@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Nebris Pharmacy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="CSS/style.css">
 </head>
 <body>
@@ -12,11 +13,12 @@
             <div class="logo">
                 <h1>Nebris Pharmacy</h1>
             </div>
-            <ul>
+            <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="products.html">Products</a></li>
-                <li><a href="login.html">Login</a></li>
-                <li><a href="register.html">Register</a></li>
+                <li><a href="login.html" id="loginLink">Login</a></li>
+                <li><a href="register.html" id="registerLink">Register</a></li>
+                <li><a href="#" id="logoutLink">Logout</a></li>
             </ul>
         </nav>
     </header>
@@ -24,7 +26,7 @@
     <main class="container main-content">
         <div class="login-container">
             <h2>Login to Your Account</h2>
-            <form action="PHP/login.php" method="POST" class="login-form">
+            <form class="login-form">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" class="form-control" required>
@@ -72,5 +74,32 @@
             </div>
         </div>
     </footer>
+
+    <div id="cart-sidebar" class="cart-sidebar">
+        <div class="cart-sidebar-header">
+            <h3>Shopping Cart</h3>
+            <button id="close-cart-sidebar" class="close-cart-btn">&times;</button>
+        </div>
+        <div id="cart-sidebar-items" class="cart-sidebar-items">
+            <!-- Cart items will be loaded here -->
+        </div>
+        <div class="cart-sidebar-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-sidebar-total">$0.00</span>
+            </div>
+            <a href="cart.html" class="btn btn-primary">View Cart</a>
+        </div>
+    </div>
+
+    <div id="cart-sidebar-overlay" class="cart-sidebar-overlay"></div>
+    <div id="cart-icon" class="cart-icon">
+        <span class="cart-count">0</span>
+        <i class="fas fa-shopping-cart"></i>
+    </div>
+
+    <!--- JS --->
+    <script src="JS/login.js"></script>
+    <script src="JS/cart-sidebar.js"></script>
 </body>
 </html> 
