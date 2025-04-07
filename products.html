@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - Nebris Pharmacy</title>
+    <link rel="stylesheet" href="CSS/style.css">
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">
+                <h1>Nebris Pharmacy</h1>
+            </div>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html">Register</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container main-content">
+        <div class="products-header">
+            <h1>Our Products</h1>
+            <div class="filter-section">
+                <select id="category-filter" class="form-control">
+                    <option value="">All Categories</option>
+                    <option value="1">Prescription Medicines</option>
+                    <option value="2">Over-the-Counter</option>
+                    <option value="3">Vitamins and Supplements</option>
+                    <option value="4">Personal Care</option>
+                    <option value="5">Medical Supplies</option>
+                </select>
+                <input type="text" id="search" class="form-control" placeholder="Search products...">
+            </div>
+        </div>
+
+        <div class="product-grid">
+            <!-- Product 1 -->
+            <div class="product-card">
+                <img src="images/PJarr.png" alt="Vitamin C" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">Vitamin C 1000mg</h3>
+                    <p class="product-category">Vitamins and Supplements</p>
+                    <p class="product-price">$19.99</p>
+                    <a href="product.html?id=1" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product-card">
+                <img src="images/PPill.png" alt="Pain Relief" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">Pain Relief Tablets</h3>
+                    <p class="product-category">Over-the-Counter</p>
+                    <p class="product-price">$12.99</p>
+                    <a href="product.html?id=2" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product-card">
+                <img src="images/PAid.png" alt="First Aid Kit" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">First Aid Kit</h3>
+                    <p class="product-category">Medical Supplies</p>
+                    <p class="product-price">$29.99</p>
+                    <a href="product.html?id=3" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="product-card">
+                <img src="images/PHand.png" alt="Hand Sanitizer" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">Hand Sanitizer</h3>
+                    <p class="product-category">Personal Care</p>
+                    <p class="product-price">$8.99</p>
+                    <a href="product.html?id=4" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+
+            <!-- Product 5 -->
+            <div class="product-card">
+                <img src="images/PMult.png" alt="Multivitamins" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">Multivitamins</h3>
+                    <p class="product-category">Vitamins and Supplements</p>
+                    <p class="product-price">$24.99</p>
+                    <a href="product.html?id=5" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+
+            <!-- Product 6 -->
+            <div class="product-card">
+                <img src="images/PBlood.png" alt="Blood Pressure Monitor" class="product-image">
+                <div class="product-info">
+                    <h3 class="product-title">Blood Pressure Monitor</h3>
+                    <p class="product-category">Medical Supplies</p>
+                    <p class="product-price">$49.99</p>
+                    <a href="product.html?id=6" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+
+        <!--- Currently leads nowhere as there is no other page for pagination--->
+        <div class="pagination">
+            <a href="#" class="btn btn-primary">Previous</a>
+            <a href="#" class="btn btn-primary">1</a>
+            <a href="#" class="btn btn-primary">2</a>
+            <a href="#" class="btn btn-primary">3</a>
+            <a href="#" class="btn btn-primary">Next</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About Us</h3>
+                    <p>Your trusted pharmacy partner providing quality healthcare products and services.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <ul>
+                        <li>Email: info@pharmacyshop.com</li>
+                        <li>Phone: (123) 456-7890</li>
+                        <li>Address: 123 Pharmacy St, City</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Nebris Pharmacy. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 
