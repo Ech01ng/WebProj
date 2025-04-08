@@ -202,7 +202,8 @@ nav {
 
 /* Product Card Styling */
 .product-card {
-    background: white;
+    background: #2c3e50;
+    color: white;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -244,7 +245,7 @@ nav {
     max-width: 800px;
     margin: 2rem auto;
     padding: 2rem;
-    background: #1a1a1a;
+    background: #2c3e50;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     color: white;
@@ -280,7 +281,7 @@ nav {
 .link {
     margin-top: 1rem;
     text-align: center;
-    color: #333;
+    color: white;
 }
 
 .link a {
@@ -294,7 +295,8 @@ nav {
 
 /* Checkout Form Styles */
 .checkout-section {
-    background: #fff;
+    background: #2c3e50;
+    color: white;
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
@@ -314,7 +316,7 @@ nav {
     max-width: 600px;
     margin: 2rem auto;
     padding: 2rem;
-    background: #1a1a1a;
+    background: #2c3e50;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     color: white;
