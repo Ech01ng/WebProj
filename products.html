@@ -1,21 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Basic meta tags for character encoding and responsive viewport -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products - Nebris Pharmacy</title>
-    <!-- Font Awesome -->
+    
+    <!-- External CSS Libraries -->
+    <!-- Font Awesome for icons like shopping cart, close buttons etc -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <!-- CSS -->
+    <!-- Custom CSS for styling -->
     <link rel="stylesheet" href="CSS/style.css">
-    <!-- JS -->
+    
+    <!-- JavaScript Files -->
+    <!-- Authentication and navbar state management -->
     <script src="JS/login.js"></script>
+    <!-- Product filtering and search functionality -->
     <script src="JS/products.js"></script>
+    <!-- Shopping cart sidebar functionality -->
     <script src="JS/cart-sidebar.js"></script>
 </head>
 <body>
     
-    <!--- Navbar --->
+    <!-- Navigation Bar Section -->
+    <!-- Contains logo and navigation links with dynamic visibility based on login state -->
     <header>
         <nav class="container">
             <div class="logo">
@@ -24,6 +32,7 @@
             <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="products.html">Products</a></li>
+                <!-- These links' visibility is controlled by login.js -->
                 <li><a href="login.html" id="loginLink">Login</a></li>
                 <li><a href="register.html" id="registerLink">Register</a></li>
                 <li><a href="#" id="logoutLink">Logout</a></li>
@@ -31,10 +40,12 @@
         </nav>
     </header>
 
-    <!-- Main Content -->
+    <!-- Main Content Section -->
     <main class="container main-content">
+        <!-- Products Header with Filtering Options -->
         <div class="products-header">
             <h1>Our Products</h1>
+            <!-- Filter Section - Category dropdown and search input -->
             <div class="filter-section">
                 <label for="category-filter">Filter by Category:</label>
                 <select id="category-filter" class="form-control" title="Select product category">
@@ -45,11 +56,15 @@
                     <option value="4">Personal Care</option>
                     <option value="5">Medical Supplies</option>
                 </select>
+                <!-- Search input for filtering products by name -->
                 <input type="text" id="search" class="form-control" placeholder="Search products...">
             </div>
         </div>
 
+        <!-- Product Grid - Displays all products in a responsive grid layout -->
         <div class="product-grid">
+            <!-- Individual Product Cards -->
+            <!-- Each card contains image, title, category, price and add to cart button -->
             <!-- Product 1 -->
             <div class="product-card">
                 <img src="images/PJarr.png" alt="Vitamin C" class="product-image">
@@ -57,6 +72,7 @@
                     <h3 class="product-title">Vitamin C 1000mg</h3>
                     <p class="product-category">Vitamins and Supplements</p>
                     <p class="product-price">$19.99</p>
+                    <!-- Add to cart button with onclick handler -->
                     <button onclick="addToCart(1)" class="add-to-cart-btn">Add to Cart</button>
                 </div>
             </div>
@@ -117,7 +133,8 @@
             </div>
         </div>
 
-        <!--- Currently leads nowhere as there is no other page for pagination--->
+        <!-- Pagination Section -->
+        <!-- Currently non-functional, for UI demonstration only -->
         <div class="pagination">
             <a href="#" class="btn btn-primary">Previous</a>
             <a href="#" class="btn btn-primary">1</a>
@@ -127,7 +144,8 @@
         </div>
     </main>
 
-    <!--- Footer --->
+    <!-- Footer Section -->
+    <!-- Contains About Us, Quick Links and Contact Information -->
     <footer>
         <div class="container">
             <div class="footer-content">
@@ -158,14 +176,19 @@
         </div>
     </footer>
 
+    <!-- Shopping Cart Sidebar -->
+    <!-- Slides in from the right when cart icon is clicked -->
     <div id="cart-sidebar" class="cart-sidebar">
+        <!-- Cart Header with title and close button -->
         <div class="cart-sidebar-header">
             <h3>Shopping Cart</h3>
             <button id="close-cart-sidebar" class="close-cart-btn">&times;</button>
         </div>
+        <!-- Cart Items Container - Populated dynamically by cart-sidebar.js -->
         <div id="cart-sidebar-items" class="cart-sidebar-items">
             <!-- Cart items will be loaded here -->
         </div>
+        <!-- Cart Footer with total and checkout button -->
         <div class="cart-sidebar-footer">
             <div class="cart-total">
                 <span>Total:</span>
@@ -175,7 +198,12 @@
         </div>
     </div>
 
+    <!-- Cart Overlay -->
+    <!-- Dark overlay behind cart sidebar when it's open -->
     <div id="cart-sidebar-overlay" class="cart-sidebar-overlay"></div>
+    
+    <!-- Floating Cart Icon -->
+    <!-- Fixed position cart icon with item count -->
     <div id="cart-icon" class="cart-icon">
         <span class="cart-count">0</span>
         <i class="fas fa-shopping-cart"></i>

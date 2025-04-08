@@ -1,34 +1,35 @@
 // Purpose of this file is to handle the cart sidebar functionality
-// Load cart sidebar HTML
+// Initialize cart functionality when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     setupCartSidebar();
-    loadCartSidebar(); // Load cart contents immediately
+    loadCartSidebar(); // Initial cart load
 });
 
-// Setup cart sidebar functionality
+// Setup event listeners for cart sidebar interactions
 function setupCartSidebar() {
     const cartIcon = document.getElementById('cart-icon');
     const cartSidebar = document.getElementById('cart-sidebar');
     const cartOverlay = document.getElementById('cart-sidebar-overlay');
     const closeBtn = document.getElementById('close-cart-sidebar');
 
+    // Verify all required elements exist
     if (!cartIcon || !cartSidebar || !cartOverlay || !closeBtn) {
         console.error('Cart elements not found');
         return;
     }
 
-    // Open cart sidebar
+    // Open cart sidebar when cart icon is clicked
     cartIcon.addEventListener('click', () => {
         cartSidebar.classList.add('open');
         cartOverlay.classList.add('show');
-        loadCartSidebar(); // Refresh cart contents when opened
+        loadCartSidebar(); // Refresh cart contents
     });
 
-    // Close cart sidebar
+    // Close cart sidebar when close button or overlay is clicked
     closeBtn.addEventListener('click', closeCartSidebar);
     cartOverlay.addEventListener('click', closeCartSidebar);
 
-    // Close on escape key
+    // Close cart sidebar when Escape key is pressed
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeCartSidebar();
@@ -36,7 +37,7 @@ function setupCartSidebar() {
     });
 }
 
-// Close cart sidebar
+// Close the cart sidebar and overlay
 function closeCartSidebar() {
     const cartSidebar = document.getElementById('cart-sidebar');
     const cartOverlay = document.getElementById('cart-sidebar-overlay');
@@ -47,11 +48,12 @@ function closeCartSidebar() {
     }
 }
 
-// Load cart sidebar contents
+// Load cart contents from server
 function loadCartSidebar() {
     const formData = new FormData();
     formData.append('action', 'get');
 
+    // Fetch cart data from server
     fetch('PHP/cart.php', {
         method: 'POST',
         body: formData
@@ -76,7 +78,7 @@ function loadCartSidebar() {
     });
 }
 
-// Display cart items in sidebar
+// Display cart items in the sidebar
 function displayCartSidebar(data) {
     const cartItems = document.getElementById('cart-sidebar-items');
     const cartTotal = document.getElementById('cart-sidebar-total');
@@ -88,19 +90,21 @@ function displayCartSidebar(data) {
     
     cartItems.innerHTML = '';
 
+    // Show empty cart message if no items
     if (!data.items || data.items.length === 0) {
         cartItems.innerHTML = '<p class="empty-cart-message">Your cart is empty</p>';
         cartTotal.textContent = '$0.00';
         return;
     }
 
+    // Create HTML elements for each cart item
     data.items.forEach(item => {
         const itemElement = document.createElement('div');
         itemElement.className = 'cart-sidebar-item';
         const price = parseFloat(item.price).toFixed(2);
         const subtotal = parseFloat(item.subtotal).toFixed(2);
         
-        // This is the HTML for the cart sidebar item
+        // Generate HTML for cart item
         itemElement.innerHTML = `
             <div class="cart-sidebar-item-image">
                 <img src="${item.image_url || 'images/placeholder.png'}" alt="${item.name}">
@@ -114,12 +118,12 @@ function displayCartSidebar(data) {
         cartItems.appendChild(itemElement);
     });
 
-    // Update total with proper formatting
+    // Update total price with proper formatting
     const total = parseFloat(data.total).toFixed(2);
     cartTotal.textContent = `$${total}`;
 }
 
-// Update cart count badge
+// Update the cart count badge
 function updateCartCount(count = 0) {
     const cartCount = document.querySelector('.cart-count');
     if (cartCount) {
@@ -130,15 +134,17 @@ function updateCartCount(count = 0) {
     }
 }
 
-// Add to cart function
+// Add item to cart
 function addToCart(productId, quantity = 1) {
     console.log('Adding to cart:', { productId, quantity }); // Debug log
     
+    // Prepare form data for cart addition
     const formData = new FormData();
     formData.append('action', 'add');
     formData.append('product_id', productId.toString());
     formData.append('quantity', quantity.toString());
 
+    // Send request to add item to cart
     fetch('PHP/cart.php', {
         method: 'POST',
         body: formData
@@ -159,10 +165,10 @@ function addToCart(productId, quantity = 1) {
     .then(data => {
         console.log('Add to cart response:', data); // Debug log
         if (data.success) {
+            // Update cart display and open sidebar
             displayCartSidebar(data);
             updateCartCount(data.count);
             
-            // Show success message and open sidebar
             const cartSidebar = document.getElementById('cart-sidebar');
             const cartOverlay = document.getElementById('cart-sidebar-overlay');
             if (cartSidebar && cartOverlay) {

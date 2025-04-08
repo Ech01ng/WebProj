@@ -1,44 +1,40 @@
-// Purpose of this file is to filter the products based on the category and search term
+// Initialize product filtering functionality when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Get the cart icon
+    // Get DOM elements for filtering
     const categoryFilter = document.getElementById('category-filter');
-    // Get the search input
     const searchInput = document.getElementById('search');
-    // Get the product cards
     const productCards = document.querySelectorAll('.product-card');
 
-    // Function to filter products
+    // Main function to filter products based on category and search term
     function filterProducts() {
-        // Get the selected category
+        // Get current filter values
         const selectedCategory = categoryFilter.value.toLowerCase();
-        // Get the search term
         const searchTerm = searchInput.value.toLowerCase();
 
-        // Loop through all product cards
+        // Check each product card against filters
         productCards.forEach(card => {
-            // Get the category and title of the current card
+            // Get product details from card
             const category = card.querySelector('.product-category').textContent.toLowerCase();
             const title = card.querySelector('.product-title').textContent.toLowerCase();
-            // Check if the card matches the selected category and search term
+            
+            // Check if product matches both filters
             const matchesCategory = !selectedCategory || category.includes(selectedCategory);
             const matchesSearch = !searchTerm || title.includes(searchTerm);
 
-            // Show/hide based on filters
+            // Show/hide product based on filter matches
             if (matchesCategory && matchesSearch) {
-                // Show the card if it matches both filters
-                card.style.display = '';
+                card.style.display = ''; // Show product
             } else {
-                // Hide the card if it doesn't match either filter
-                card.style.display = 'none';
+                card.style.display = 'none'; // Hide product
             }
         });
     }
 
-    // Add event listeners
+    // Add event listeners for real-time filtering
     categoryFilter.addEventListener('change', filterProducts);
     searchInput.addEventListener('input', filterProducts);
 
-    // Initialize category mapping
+    // Category mapping for filter values to actual category names
     const categoryMap = {
         '1': 'prescription medicines',
         '2': 'over-the-counter',
@@ -47,32 +43,27 @@ document.addEventListener('DOMContentLoaded', function() {
         '5': 'medical supplies'
     };
 
-    // Update category filter to use the mapping
+    // Enhanced category filter with mapping
     categoryFilter.addEventListener('change', function() {
-        // Get the selected value
+        // Get selected category value
         const selectedValue = this.value;
-        // Get the selected category from the mapping
+        // Convert category ID to actual category name
         const selectedCategory = categoryMap[selectedValue] || '';
         
-        // Loop through all product cards
+        // Filter products with mapped category
         productCards.forEach(card => {
-            // Get the category of the current card
             const category = card.querySelector('.product-category').textContent.toLowerCase();
-            // Check if the card matches the selected category
             const matchesCategory = !selectedValue || category.includes(selectedCategory);
-            // Get the search term
+            
+            // Also check against current search term
             const searchTerm = searchInput.value.toLowerCase();
-            // Get the title of the current card
             const title = card.querySelector('.product-title').textContent.toLowerCase();
-            // Check if the card matches the search term
             const matchesSearch = !searchTerm || title.includes(searchTerm);
 
-            // Show/hide based on filters
+            // Show/hide product based on both filters
             if (matchesCategory && matchesSearch) {
-                // Show the card if it matches both filters
                 card.style.display = '';
             } else {
-                // Hide the card if it doesn't match either filter
                 card.style.display = 'none';
             }
         });

@@ -1,32 +1,45 @@
 <?php
+// Start session for cart data persistence
 session_start();
 require_once 'config.php';
 
-// Enable error reporting for debugging
+// Enable error reporting for development environment
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Log function for debugging
+/**
+ * Log error messages to the server's error log
+ * @param string $message Error message to log
+ */
 function logError($message) {
     error_log(date('Y-m-d H:i:s') . " - Cart Error: " . $message);
 }
 
-// Initialize cart if it doesn't exist
+// Initialize empty cart in session if it doesn't exist
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = array();
 }
 
-// Function to add item to cart
+/**
+ * Add a product to the cart
+ * @param int $product_id Product ID to add
+ * @param int $quantity Quantity to add (default: 1)
+ * @return bool True if successful
+ */
 function addToCart($product_id, $quantity = 1) {
     if (isset($_SESSION['cart'][$product_id])) {
-        $_SESSION['cart'][$product_id] += $quantity;
+        $_SESSION['cart'][$product_id] += $quantity; // Increment existing quantity
     } else {
-        $_SESSION['cart'][$product_id] = $quantity;
+        $_SESSION['cart'][$product_id] = $quantity; // Add new item
     }
     return true;
 }
 
-// Function to remove item from cart
+/**
+ * Remove a product from the cart
+ * @param int $product_id Product ID to remove
+ * @return bool True if successful, False if product not found
+ */
 function removeFromCart($product_id) {
     if (isset($_SESSION['cart'][$product_id])) {
         unset($_SESSION['cart'][$product_id]);
@@ -35,23 +48,37 @@ function removeFromCart($product_id) {
     return false;
 }
 
-// Function to update cart item quantity
+/**
+ * Update quantity of a cart item
+ * @param int $product_id Product ID to update
+ * @param int $quantity New quantity
+ * @return bool True if successful
+ */
 function updateCartQuantity($product_id, $quantity) {
     if ($quantity > 0) {
         $_SESSION['cart'][$product_id] = $quantity;
         return true;
     } else {
-        return removeFromCart($product_id);
+        return removeFromCart($product_id); // Remove if quantity is 0
     }
 }
 
-// Function to format price in euros
+/**
+ * Format price with 2 decimal places
+ * @param float Price to format
+ * @return string Formatted price
+ */
 function formatPrice($price) {
     return number_format(floatval($price), 2, '.', '');
 }
 
-// Function to get cart contents with product details
+/**
+ * Get complete cart contents with product details
+ * @param mysqli $conn Database connection
+ * @return array Cart data including items, total and count
+ */
 function getCartContents($conn) {
+    // Return empty cart if no items
     if (empty($_SESSION['cart'])) {
         return array(
             'items' => array(),
@@ -64,30 +91,36 @@ function getCartContents($conn) {
     $total = 0;
     $count = 0;
 
+    // Loop through cart items and get product details from database
     foreach ($_SESSION['cart'] as $product_id => $quantity) {
         try {
+            // Prepare SQL to get product details
             $stmt = $conn->prepare("SELECT product_id, name, price, image_url FROM products WHERE product_id = ?");
             if (!$stmt) {
                 logError("Failed to prepare statement: " . $conn->error);
                 throw new Exception("Failed to prepare statement: " . $conn->error);
             }
             
+            // Execute query with product ID
             $stmt->bind_param("i", $product_id);
             if (!$stmt->execute()) {
                 logError("Failed to execute statement: " . $stmt->error);
                 throw new Exception("Failed to execute statement: " . $stmt->error);
             }
             
+            // Get query results
             $result = $stmt->get_result();
             if (!$result) {
                 logError("Failed to get result: " . $stmt->error);
                 throw new Exception("Failed to get result: " . $stmt->error);
             }
             
+            // Process product data if found
             if ($product = $result->fetch_assoc()) {
-                // Get raw price values
                 $price = $product['price'];
                 $subtotal = $price * $quantity;
+                
+                // Add item details to cart array
                 $items[] = array(
                     'id' => intval($product['product_id']),
                     'name' => $product['name'],
@@ -96,6 +129,8 @@ function getCartContents($conn) {
                     'quantity' => intval($quantity),
                     'subtotal' => $subtotal
                 );
+                
+                // Update cart totals
                 $total += $subtotal;
                 $count += $quantity;
             } else {
@@ -109,6 +144,7 @@ function getCartContents($conn) {
         }
     }
 
+    // Return complete cart data
     return array(
         'items' => $items,
         'total' => $total,
@@ -116,7 +152,12 @@ function getCartContents($conn) {
     );
 }
 
-// Function to send JSON response
+/**
+ * Send JSON response to client
+ * @param bool $success Whether the operation was successful
+ * @param string $message Optional message
+ * @param array $data Additional data to include in response
+ */
 function sendJsonResponse($success, $message = '', $data = array()) {
     $response = array_merge(
         array(
@@ -138,7 +179,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         try {
             switch ($_POST['action']) {
+                // Add item to cart
                 case 'add':
+                    // Validate required parameters
                     if (!isset($_POST['product_id']) || !isset($_POST['quantity'])) {
                         throw new Exception('Missing product_id or quantity');
                     }
@@ -148,11 +191,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     logError("Attempting to add product: " . $product_id . " with quantity: " . $quantity);
                     
+                    // Validate quantity
                     if ($quantity <= 0) {
                         throw new Exception('Invalid quantity');
                     }
                     
-                    // Check if product exists
+                    // Verify product exists in database
                     $stmt = $conn->prepare("SELECT product_id FROM products WHERE product_id = ?");
                     if (!$stmt) {
                         logError("Failed to prepare statement: " . $conn->error);
@@ -171,6 +215,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         throw new Exception("Failed to get result: " . $stmt->error);
                     }
                     
+                    // Add to cart if product exists
                     if ($result->num_rows > 0) {
                         if (isset($_SESSION['cart'][$product_id])) {
                             $_SESSION['cart'][$product_id] += $quantity;
@@ -178,6 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $_SESSION['cart'][$product_id] = $quantity;
                         }
                         
+                        // Get updated cart contents
                         $cartData = getCartContents($conn);
                         $response = array(
                             'success' => true,
@@ -194,6 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt->close();
                     break;
                     
+                // Remove item from cart
                 case 'remove':
                     if (isset($_POST['product_id'])) {
                         $product_id = intval($_POST['product_id']);
@@ -211,6 +258,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     break;
                 
+                // Update cart item quantity
                 case 'update':
                     if (isset($_POST['product_id']) && isset($_POST['quantity'])) {
                         $product_id = intval($_POST['product_id']);
@@ -233,6 +281,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     break;
                 
+                // Get cart contents
                 case 'get':
                     $cartData = getCartContents($conn);
                     $response = array(
@@ -243,6 +292,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     );
                     break;
 
+                // Checkout
                 case 'checkout':
                     // Check if user is logged in
                     if (!isset($_SESSION['id'])) {
