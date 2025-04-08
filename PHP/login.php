@@ -104,12 +104,12 @@ function handleLogin() {
                                 ]);
                                 exit;
                             } else {
-                                echo json_encode(['success' => false, 'error' => 'Invalid password']);
+                                echo json_encode(['success' => false, 'error' => 'Invalid username or password']);
                                 exit;
                             }
                         }
                     } else {
-                        echo json_encode(['success' => false, 'error' => 'Username not found']);
+                        echo json_encode(['success' => false, 'error' => 'Invalid username or password']);
                         exit;
                     }
                 } else {

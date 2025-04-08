@@ -88,7 +88,7 @@ nav {
     padding: 2rem 0;
 }
 
-/* Form Styles */
+/* Search Bar Styles */
 .form-group {
     margin-bottom: 1rem;
 }
@@ -287,8 +287,8 @@ nav {
 .checkout-section {
     background: #fff;
     padding: 2rem;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
 .form-row {
