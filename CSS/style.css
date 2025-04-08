@@ -200,49 +200,63 @@ nav {
     font-size: 1.2rem;
 }
 
-/* Login Form */
-.login-container {
+/* Form Styling */
+.form-container {
     max-width: 400px;
     margin: 2rem auto;
     padding: 2rem;
-    background: white;
+    background: #1a1a1a;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    color: white;
 }
 
-/* Register Form */
-.register-container {
-    max-width: 400px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: white;
-}
-
-.register-form {
+.form-style {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-.register-form .form-group {
+.form-style .form-group {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }   
 
-.register-form .form-control {
+.form-style .form-control {
     padding: 0.75rem;
     border: 1px solid #ddd;
     border-radius: 4px;
 }   
 
-.register-form .btn-primary {
+.form-style .btn-primary {
     background-color: #3498db;
     color: white;
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
 }   
 
-.register-form .btn-primary:hover {
+.form-style .btn-primary:hover {
     background-color: #2980b9;
+}
+
+/* Login / Register Link From Login.html and Register.html */
+.link {
+    margin-top: 1rem;
+    text-align: center;
+    color: #333;
+}
+
+.link a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.link a:hover {
+    text-decoration: underline;
 }
 
 /* Contact Form */
@@ -714,29 +728,26 @@ footer {
 }
 
 /* Notification Styles */
-.notification {
-    position: fixed;
-    top: -100px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 15px 30px;
+.form-notification {
+    margin-top: 20px;
+    padding: 15px;
     border-radius: 5px;
-    color: white;
+    text-align: center;
     font-weight: bold;
-    z-index: 1000;
     opacity: 0;
-    transition: all 0.5s ease;
+    transition: opacity 0.5s ease;
 }
 
-.notification.show {
-    top: 20px;
+.form-notification.show {
     opacity: 1;
 }
 
-.notification.success {
+.form-notification.success {
     background-color: #4CAF50;
+    color: white;
 }
 
-.notification.error {
+.form-notification.error {
     background-color: #f44336;
+    color: white;
 } 

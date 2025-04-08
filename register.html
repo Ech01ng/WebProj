@@ -13,28 +13,12 @@
     <script src="JS/login.js"></script>
 </head>
 <body>
-    <header>
-        <nav class="container">
-            <div class="logo">
-                <h1>Nebris Pharmacy</h1>
-            </div>
-            <!--- Navbar --->
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="products.html">Products</a></li>
-                <li><a href="login.html" id="loginLink">Login</a></li>
-                <li><a href="register.html" id="registerLink">Register</a></li>
-                <li><a href="#" id="logoutLink">Logout</a></li>
-            </ul>
-        </nav>
-    </header>
-
     <!--- Main Content --->
     <main class="container main-content">
         <!--- Register Container --->
-        <div class="register-container">
+        <div class="form-container">
             <h2>Create an Account</h2>
-            <form action="PHP/register.php" method="POST" class="register-form">
+            <form action="PHP/register.php" method="POST" class="form-style">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" class="form-control" required>
@@ -55,7 +39,7 @@
                     <button type="submit" class="btn btn-primary">Register</button>
                 </div>
                 <div class="form-group">
-                    <p>Already have an account? <a href="login.html">Login here</a></p>
+                    <p class="link">Already have an account? <a href="login.html">Login here</a></p>
                 </div>
             </form>
         </div>
