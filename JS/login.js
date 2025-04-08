@@ -15,20 +15,27 @@ function checkUrlParams() {
 // Function to handle login form submission
 function handleLogin(event) {
     event.preventDefault();
+    console.log('Login form submitted');
     
     const formData = new FormData(event.target);
+    console.log('Form data:', {
+        username: formData.get('username'),
+        password: formData.get('password') ? '[PRESENT]' : '[MISSING]'
+    });
     
     fetch('PHP/login.php?action=login', {
         method: 'POST',
         body: formData
     })
     .then(response => {
+        console.log('Response status:', response.status);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         return response.json();
     })
     .then(data => {
+        console.log('Login response:', data);
         if (data.success) {
             // Store login state
             localStorage.setItem('isLoggedIn', 'true');
@@ -38,7 +45,7 @@ function handleLogin(event) {
         }
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error('Login error:', error);
         alert('An error occurred during login. Please check your database connection.');
     });
 }
