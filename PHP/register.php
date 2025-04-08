@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+header('Content-Type: application/json');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST["username"]);
@@ -53,18 +54,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             mysqli_stmt_bind_param($stmt, "sss", $username, $email, $hashed_password);
             
             if(mysqli_stmt_execute($stmt)) {
-                // Redirect to login page
-                header("location: ../login.html");
+                mysqli_stmt_close($stmt);
+                mysqli_close($conn);
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Registration successful',
+                    'redirect' => 'login.html'
+                ]);
+                exit;
             } else {
-                echo "Something went wrong. Please try again later.";
+                $errors[] = "Something went wrong. Please try again later.";
             }
             mysqli_stmt_close($stmt);
         }
-    } else {
-        // Display errors
-        foreach($errors as $error) {
-            echo $error . "<br>";
-        }
+    }
+    
+    // If there are errors, return them as JSON
+    if (!empty($errors)) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'errors' => $errors
+        ]);
+        exit;
     }
 }
 
