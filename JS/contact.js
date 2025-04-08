@@ -11,13 +11,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Create notification element
     const notification = document.createElement('div');
-    notification.className = 'notification';
-    document.body.appendChild(notification);
+    notification.className = 'form-notification';
+    // Insert notification after the submit button's parent div
+    submitButton.parentElement.after(notification);
     
     // Function to show notification
     function showNotification(message, type) {
         notification.textContent = message;
-        notification.className = `notification ${type}`;
+        notification.className = `form-notification ${type}`;
         // Trigger reflow to ensure animation works
         notification.offsetHeight;
         notification.classList.add('show');
