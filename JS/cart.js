@@ -1,336 +1,450 @@
-// Load cart contents when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    checkLoginStatusAndLoadCart();
-});
+// Purpose of this file is to handle the cart functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Load cart on page load
+    loadCart();
 
-// Function to check login status and load cart
-function checkLoginStatusAndLoadCart() {
-    console.log('Checking login status...');
-    
-    fetch('PHP/login.php?action=check')
-        .then(response => {
-            console.log('Login check response:', response);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Login check data:', data);
-            // Log debug information if available
-            if (data.debug) {
-                console.log('Session debug info:', data.debug);
-            }
+    // Add event listeners for cart actions
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('add-to-cart')) {
+            const productId = e.target.dataset.productId;
+            const quantity = document.querySelector(`#quantity-${productId}`).value;
+            addToCart(productId, quantity);
+        }
+    });
+
+    // Get form elements once
+    const checkoutForm = document.getElementById('checkout-form');
+    const cardNumberInput = document.getElementById('card-number');
+    const cardExpiryInput = document.getElementById('card-expiry');
+    const cardCVVInput = document.getElementById('card-cvv');
+    const billingAddressInput = document.getElementById('billing-address');
+    const paymentMethodInput = document.getElementById('payment-method');
+
+    // Add event listeners for real-time validation
+    if (cardNumberInput) {
+        cardNumberInput.addEventListener('input', function() {
+            // Remove any non-digit characters
+            this.value = this.value.replace(/\D/g, '');
             
-            const checkoutSection = document.querySelector('.checkout-section');
-            const originalCheckoutForm = document.getElementById('checkout-form');
-            
-            if (!data.loggedin) {
-                console.log('User is not logged in');
-                // Hide checkout form and show login message
-                if (checkoutSection) {
-                    // Store the original checkout form if it hasn't been stored yet
-                    if (originalCheckoutForm && !checkoutSection.dataset.hasOriginalForm) {
-                        checkoutSection.dataset.hasOriginalForm = 'true';
-                        originalCheckoutForm.style.display = 'none';
-                    }
-                    
-                    // Show login message
-                    const loginMessage = document.createElement('div');
-                    loginMessage.className = 'login-message';
-                    loginMessage.innerHTML = `
-                        <h2>Please Login to Checkout</h2>
-                        <p>You need to be logged in to complete your purchase.</p>
-                        <div class="login-buttons">
-                            <a href="login.html" class="btn btn-primary">Login</a>
-                            <a href="register.html" class="btn btn-secondary">Register</a>
-                        </div>
-                    `;
-                    
-                    // Remove any existing login message
-                    const existingMessage = checkoutSection.querySelector('.login-message');
-                    if (existingMessage) {
-                        existingMessage.remove();
-                    }
-                    
-                    checkoutSection.appendChild(loginMessage);
-                }
-            } else {
-                console.log('User is logged in as:', data.username);
-                if (checkoutSection && originalCheckoutForm) {
-                    // Remove any login message
-                    const loginMessage = checkoutSection.querySelector('.login-message');
-                    if (loginMessage) {
-                        loginMessage.remove();
-                    }
-                    
-                    // Show the checkout form
-                    originalCheckoutForm.style.display = 'block';
-                    setupCheckoutForm();
-                }
+            // Limit to 16 digits
+            if (this.value.length > 16) {
+                this.value = this.value.slice(0, 16);
             }
-            
-            // Load cart regardless of login status
-            loadCart();
-        })
-        .catch(error => {
-            console.error('Error checking login status:', error);
-            // Show error message and load cart
-            if (checkoutSection) {
-                checkoutSection.innerHTML = `
-                    <h2>Error Checking Login Status</h2>
-                    <p>There was an error verifying your login status. Please try refreshing the page.</p>
-                    <p>Error details: ${error.message}</p>
-                `;
-            }
-            loadCart();
+
+            const validation = validateCardNumber(this.value);
+            showValidationMessage(this, validation.message, validation.isValid);
         });
-}
+    }
+
+    if (cardCVVInput) {
+        cardCVVInput.addEventListener('input', function() {
+            // Remove any non-digit characters
+            this.value = this.value.replace(/\D/g, '');
+            
+            // Limit to 3 digits
+            if (this.value.length > 3) {
+                this.value = this.value.slice(0, 3);
+            }
+
+            const validation = validateCVV(this.value);
+            showValidationMessage(this, validation.message, validation.isValid);
+        });
+    }
+
+    if (cardExpiryInput) {
+        cardExpiryInput.addEventListener('input', function() {
+            // Format as MM/YY
+            let value = this.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.slice(0, 2) + '/' + value.slice(2);
+            }
+            this.value = value.slice(0, 5);
+
+            const validation = validateExpiry(this.value);
+            showValidationMessage(this, validation.message, validation.isValid);
+        });
+    }
+
+    if (billingAddressInput) {
+        billingAddressInput.addEventListener('input', function() {
+            const validation = validateBillingAddress(this.value);
+            showValidationMessage(this, validation.message, validation.isValid);
+        });
+    }
+
+    if (paymentMethodInput) {
+        paymentMethodInput.addEventListener('change', function() {
+            const validation = validatePaymentMethod(this.value);
+            showValidationMessage(this, validation.message, validation.isValid);
+        });
+    }
+
+    // Update checkout form submission handler
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Form submission intercepted');
+
+            // Validate all fields
+            const cardNumberValidation = validateCardNumber(cardNumberInput.value);
+            const cardExpiryValidation = validateExpiry(cardExpiryInput.value);
+            const cardCVVValidation = validateCVV(cardCVVInput.value);
+            const billingAddressValidation = validateBillingAddress(billingAddressInput.value);
+            const paymentMethodValidation = validatePaymentMethod(paymentMethodInput.value);
+
+            // Show validation messages
+            showValidationMessage(cardNumberInput, cardNumberValidation.message, cardNumberValidation.isValid);
+            showValidationMessage(cardExpiryInput, cardExpiryValidation.message, cardExpiryValidation.isValid);
+            showValidationMessage(cardCVVInput, cardCVVValidation.message, cardCVVValidation.isValid);
+            showValidationMessage(billingAddressInput, billingAddressValidation.message, billingAddressValidation.isValid);
+            showValidationMessage(paymentMethodInput, paymentMethodValidation.message, paymentMethodValidation.isValid);
+
+            // Check if all validations pass
+            if (!cardNumberValidation.isValid || 
+                !cardExpiryValidation.isValid || 
+                !cardCVVValidation.isValid || 
+                !billingAddressValidation.isValid || 
+                !paymentMethodValidation.isValid) {
+                console.log('Validation failed');
+                return;
+            }
+
+            // If all validations pass, proceed with checkout
+            console.log('All validations passed, proceeding with checkout');
+            checkout(
+                cardNumberInput.value,
+                cardExpiryInput.value,
+                cardCVVInput.value,
+                billingAddressInput.value,
+                paymentMethodInput.value
+            );
+        });
+    }
+});
 
 // Function to load cart contents
 function loadCart() {
-    const formData = new FormData();
-    formData.append('action', 'get');
-
     fetch('PHP/cart.php', {
         method: 'POST',
-        body: formData
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=get'
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            displayCart(data);
-            updateSummary(data);
+            updateCartDisplay(data);
         } else {
-            console.error('Failed to load cart:', data.error);
+            console.error('Error loading cart:', data.error);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while loading the cart.');
     });
 }
 
-// Function to display cart items
-function displayCart(data) {
-    const cartItems = document.getElementById('cart-items');
-    
-    if (!cartItems) {
-        console.error('Cart items container not found');
-        return;
-    }
-    
-    cartItems.innerHTML = '';
-
-    if (!data.items || data.items.length === 0) {
-        cartItems.innerHTML = '<p class="empty-cart-message">Your cart is empty</p>';
-        return;
-    }
-
-    data.items.forEach(item => {
-        const itemElement = document.createElement('div');
-        itemElement.className = 'cart-item';
-        itemElement.innerHTML = `
-            <div class="cart-item-image">
-                <img src="${item.image_url || 'images/placeholder.png'}" alt="${item.name}">
-            </div>
-            <div class="cart-item-details">
-                <h3>${item.name}</h3>
-                <p class="price">$${formatPrice(item.price)}</p>
-                <div class="quantity-controls">
-                    <button class="quantity-btn minus-btn" data-id="${item.id}" data-quantity="${item.quantity - 1}">-</button>
-                    <input type="number" value="${item.quantity}" min="1" class="quantity-input" data-id="${item.id}">
-                    <button class="quantity-btn plus-btn" data-id="${item.id}" data-quantity="${item.quantity + 1}">+</button>
-                </div>
-                <p class="subtotal">Subtotal: $${formatPrice(item.subtotal)}</p>
-            </div>
-            <button class="remove-btn" data-id="${item.id}">&times;</button>
-        `;
-
-        // Add event listeners after creating the element
-        const minusBtn = itemElement.querySelector('.minus-btn');
-        const plusBtn = itemElement.querySelector('.plus-btn');
-        const quantityInput = itemElement.querySelector('.quantity-input');
-        const removeBtn = itemElement.querySelector('.remove-btn');
-
-        minusBtn.addEventListener('click', () => {
-            const newQuantity = parseInt(minusBtn.dataset.quantity);
-            if (newQuantity >= 1) {
-                updateQuantity(minusBtn.dataset.id, newQuantity);
-            }
-        });
-
-        plusBtn.addEventListener('click', () => {
-            updateQuantity(plusBtn.dataset.id, parseInt(plusBtn.dataset.quantity));
-        });
-
-        quantityInput.addEventListener('change', (e) => {
-            updateQuantity(e.target.dataset.id, e.target.value);
-        });
-
-        removeBtn.addEventListener('click', () => {
-            removeItem(removeBtn.dataset.id);
-        });
-
-        cartItems.appendChild(itemElement);
-    });
-}
-
-// Function to update cart summary
-function updateSummary(data) {
-    const subtotal = document.getElementById('subtotal');
-    const tax = document.getElementById('tax');
-    const total = document.getElementById('total');
-
-    if (subtotal && tax && total) {
-        const subtotalAmount = data.total || 0;
-        const taxAmount = subtotalAmount * 0.1; // 10% tax
-        const totalAmount = subtotalAmount + taxAmount;
-
-        subtotal.textContent = `$${formatPrice(subtotalAmount)}`;
-        tax.textContent = `$${formatPrice(taxAmount)}`;
-        total.textContent = `$${formatPrice(totalAmount)}`;
-    }
-}
-
-// Function to format price
-function formatPrice(price) {
-    const num = parseFloat(price);
-    return isNaN(num) ? '0.00' : num.toFixed(2);
-}
-
-// Function to update item quantity
-function updateQuantity(productId, quantity) {
-    quantity = parseInt(quantity);
-    if (isNaN(quantity) || quantity < 1) {
-        alert('Please enter a valid quantity');
-        loadCart(); // Reload cart to reset invalid input
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('action', 'update');
-    formData.append('product_id', productId);
-    formData.append('quantity', quantity);
-
+// Function to add item to cart
+function addToCart(productId, quantity) {
     fetch('PHP/cart.php', {
         method: 'POST',
-        body: formData
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `action=add&product_id=${productId}&quantity=${quantity}`
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            displayCart(data);
-            updateSummary(data);
+            updateCartDisplay(data);
+            alert('Product added to cart!');
         } else {
-            console.error('Failed to update quantity:', data.error);
-            alert('Failed to update quantity');
+            alert('Error adding product to cart: ' + data.error);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while updating the quantity');
+        alert('Error adding product to cart');
     });
 }
 
 // Function to remove item from cart
-function removeItem(productId) {
-    if (!confirm('Are you sure you want to remove this item from your cart?')) {
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('action', 'remove');
-    formData.append('product_id', productId);
-
+function removeFromCart(productId) {
     fetch('PHP/cart.php', {
         method: 'POST',
-        body: formData
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `action=remove&product_id=${productId}`
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            displayCart(data);
-            updateSummary(data);
+            updateCartDisplay(data);
         } else {
-            console.error('Failed to remove item:', data.error);
-            alert('Failed to remove item from cart');
+            alert('Error removing item from cart: ' + data.error);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while removing the item');
+        alert('Error removing item from cart');
     });
 }
 
-// Function to setup checkout form
-function setupCheckoutForm() {
-    console.log('Setting up checkout form...');
-    const checkoutForm = document.getElementById('checkout-form');
-    if (checkoutForm) {
-        checkoutForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            console.log('Checkout form submitted, verifying login...');
-            
-            // Double check login status before proceeding
-            fetch('PHP/login.php?action=check')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Login verification data:', data);
-                    if (!data.loggedin) {
-                        console.log('User not logged in, redirecting to login page');
-                        alert('Please login to complete your purchase');
-                        window.location.href = 'login.html';
-                        return;
-                    }
-                    
-                    console.log('User is logged in, proceeding with checkout');
-                    const formData = new FormData(checkoutForm);
-                    formData.append('action', 'checkout');
+// Function to update cart item quantity
+function updateQuantity(productId, quantity) {
+    fetch('PHP/cart.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `action=update&product_id=${productId}&quantity=${quantity}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateCartDisplay(data);
+        } else {
+            alert('Error updating quantity: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating quantity');
+    });
+}
 
-                    // Log form data for debugging
-                    console.log('Form data being sent:');
-                    for (let pair of formData.entries()) {
-                        console.log(pair[0] + ': ' + pair[1]);
-                    }
+// Update cart display
+function updateCartDisplay(data) {
+    const cartItems = document.getElementById('cart-items');
+    const subtotalElement = document.getElementById('subtotal');
+    const taxElement = document.getElementById('tax');
+    const totalElement = document.getElementById('total');
 
-                    fetch('PHP/cart.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => {
-                        console.log('Checkout response status:', response.status);
-                        if (!response.ok) {
-                            return response.text().then(text => {
-                                console.error('Error response:', text);
-                                throw new Error('Network response was not ok: ' + text);
-                            });
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Checkout response:', data);
-                        if (data.success) {
-                            alert('Order placed successfully!');
-                            window.location.href = 'index.html';
-                        } else {
-                            alert(data.message || 'Failed to place order. Please ensure you are logged in.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error during checkout:', error);
-                        alert('An error occurred while processing your order');
-                    });
-                })
-                .catch(error => {
-                    console.error('Error verifying login status:', error);
-                    alert('An error occurred while verifying login status');
-                });
-        });
+    if (!cartItems || !data.items) {
+        console.error('Cart elements or data not found');
+        return;
     }
+
+    cartItems.innerHTML = '';
+
+    data.items.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'cart-item';
+        const price = parseFloat(item.price).toFixed(2);
+        const subtotal = parseFloat(item.subtotal).toFixed(2);
+        
+        itemElement.innerHTML = `
+            <div class="cart-item-image">
+                <img src="${item.image_url}" alt="${item.name}">
+            </div>
+            <div class="cart-item-details">
+                <h3>${item.name}</h3>
+                <div class="quantity-controls">
+                    <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity - 1})">-</button>
+                    <span class="quantity-input">${item.quantity}</span>
+                    <button class="quantity-btn" onclick="updateQuantity(${item.id}, ${item.quantity + 1})">+</button>
+                </div>
+                <p class="price-line">$${price} × ${item.quantity}</p>
+                <p class="subtotal">Subtotal: $${subtotal}</p>
+            </div>
+            <button class="remove-btn" onclick="removeFromCart(${item.id})">&times;</button>
+        `;
+        cartItems.appendChild(itemElement);
+    });
+
+    // Update summary section
+    // This is the subtotal of the cart
+    if (subtotalElement) {
+        const subtotal = parseFloat(data.total).toFixed(2);
+        subtotalElement.textContent = `$${subtotal}`;
+    }
+
+    // This is the tax of the cart
+    if (taxElement) {
+        const tax = (parseFloat(data.total) * 0.1).toFixed(2);
+        taxElement.textContent = `$${tax}`;
+    }
+
+    // This is the total of the cart
+    if (totalElement) {
+        const total = (parseFloat(data.total) * 1.1).toFixed(2);
+        totalElement.textContent = `$${total}`;
+    }
+}
+
+// Function to handle checkout
+function checkout(cardNumber, cardExpiry, cardCVV, billingAddress, paymentMethod) {
+    // Validate all required fields
+    if (!cardNumber || !cardExpiry || !cardCVV || !billingAddress || !paymentMethod) {
+        alert('Error: All fields are required. Please fill in all fields and try again.');
+        return;
+    }
+
+    // Validate card number (must be 16 digits)
+    if (!/^\d{16}$/.test(cardNumber)) {
+        alert('Error: Card number must be 16 digits.');
+        return;
+    }
+
+    // Validate CVV (must be 3 digits)
+    if (!/^\d{3}$/.test(cardCVV)) {
+        alert('Error: CVV must be 3 digits.');
+        return;
+    }
+
+    // Validate expiry date (MM/YY format)
+    if (!/^(0[1-9]|1[0-2])\/([0-9]{2})$/.test(cardExpiry)) {
+        alert('Error: Expiry date must be in MM/YY format.');
+        return;
+    }
+
+    // Check if card is expired
+    const [expiryMonth, expiryYear] = cardExpiry.split('/');
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear() % 100;
+    const currentMonth = currentDate.getMonth() + 1;
+
+    if (parseInt(expiryYear) < currentYear || 
+        (parseInt(expiryYear) === currentYear && parseInt(expiryMonth) < currentMonth)) {
+        alert('Error: Card has expired.');
+        return;
+    }
+
+    // Validate payment method
+    if (!['credit', 'debit'].includes(paymentMethod)) {
+        alert('Error: Invalid payment method.');
+        return;
+    }
+
+    // Validate billing address
+    if (billingAddress.trim().length < 10) {
+        alert('Error: Billing address must be at least 10 characters long.');
+        return;
+    }
+    
+    // Create form data
+    const formData = new FormData();
+    formData.append('action', 'checkout');
+    formData.append('card-number', cardNumber);
+    formData.append('card-expiry', cardExpiry);
+    formData.append('card-cvv', cardCVV);
+    formData.append('billing-address', billingAddress);
+    formData.append('payment-method', paymentMethod);
+    
+    // Log form data for debugging
+    console.log('Form data being sent:');
+    for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+    }
+    
+    fetch('PHP/cart.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.log('Checkout response status:', response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Checkout response:', data);
+        if (data.success) {
+            alert('Order placed successfully!');
+            window.location.href = 'index.html';
+        } else {
+            alert(data.message || 'Error processing checkout');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error processing checkout');
+    });
+}
+
+// Function to display validation message
+function showValidationMessage(inputElement, message, isValid = false) {
+    const messageDiv = inputElement.nextElementSibling;
+    if (messageDiv && messageDiv.classList.contains('validation-message')) {
+        messageDiv.textContent = message;
+        messageDiv.style.color = isValid ? '#28a745' : '#dc3545';
+        inputElement.style.borderColor = isValid ? '#28a745' : '#dc3545';
+    }
+}
+
+// Function to clear validation message
+function clearValidationMessage(inputElement) {
+    const messageDiv = inputElement.nextElementSibling;
+    if (messageDiv && messageDiv.classList.contains('validation-message')) {
+        messageDiv.textContent = '';
+        inputElement.style.borderColor = '';
+    }
+}
+
+// Function to validate card number
+function validateCardNumber(cardNumber) {
+    const regex = /^\d{16}$/;
+    if (!cardNumber) {
+        return { isValid: false, message: 'Card number is required' };
+    }
+    if (!regex.test(cardNumber)) {
+        return { isValid: false, message: 'Card number must be exactly 16 digits' };
+    }
+    return { isValid: true, message: 'Valid card number' };
+}
+
+// Function to validate CVV
+function validateCVV(cvv) {
+    const regex = /^\d{3}$/;
+    if (!cvv) {
+        return { isValid: false, message: 'CVV is required' };
+    }
+    if (!regex.test(cvv)) {
+        return { isValid: false, message: 'CVV must be exactly 3 digits' };
+    }
+    return { isValid: true, message: 'Valid CVV' };
+}
+
+// Function to validate expiry date
+function validateExpiry(expiry) {
+    const regex = /^(0[1-9]|1[0-2])\/([0-9]{2})$/;
+    if (!expiry) {
+        return { isValid: false, message: 'Expiry date is required' };
+    }
+    if (!regex.test(expiry)) {
+        return { isValid: false, message: 'Expiry date must be in MM/YY format' };
+    }
+
+    const [month, year] = expiry.split('/');
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear() % 100;
+    const currentMonth = currentDate.getMonth() + 1;
+
+    if (parseInt(year) < currentYear || 
+        (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
+        return { isValid: false, message: 'Card has expired' };
+    }
+
+    return { isValid: true, message: 'Valid expiry date' };
+}
+
+// Function to validate billing address
+function validateBillingAddress(address) {
+    if (!address) {
+        return { isValid: false, message: 'Billing address is required' };
+    }
+    if (address.trim().length < 10) {
+        return { isValid: false, message: 'Billing address must be at least 10 characters' };
+    }
+    return { isValid: true, message: 'Valid billing address' };
+}
+
+// Function to validate payment method
+function validatePaymentMethod(method) {
+    if (!method) {
+        return { isValid: false, message: 'Payment method is required' };
+    }
+    if (!['credit', 'debit'].includes(method)) {
+        return { isValid: false, message: 'Invalid payment method' };
+    }
+    return { isValid: true, message: 'Valid payment method' };
 } 

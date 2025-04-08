@@ -4,25 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us - Nebris Pharmacy</title>
+    <!-- CSS -->
     <link rel="stylesheet" href="CSS/style.css">
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JS -->
+    <script src="JS/login.js"></script>
+    <script src="JS/contact.js"></script>
 </head>
 <body>
+    <!--- Navbar --->
     <header>
         <nav class="container">
             <div class="logo">
                 <h1>Nebris Pharmacy</h1>
             </div>
-            <ul>
+            <ul class="nav-links">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="products.html">Products</a></li>
-                <li id="loginLink"><a href="login.html">Login</a></li>
-                <li id="registerLink"><a href="register.html">Register</a></li>
-                <li id="logoutLink"><a href="PHP/login.php?action=logout">Logout</a></li>
+                <li><a href="login.html" id="loginLink">Login</a></li>
+                <li><a href="register.html" id="registerLink">Register</a></li>
+                <li><a href="#" id="logoutLink" style="display: none;">Logout</a></li>
             </ul>
         </nav>
     </header>
 
+    <!--- Main Content --->
     <main class="container main-content">
+        <!--- Contact Section --->
         <div class="contact-section">
             <h1>Contact Us</h1>
             <div class="contact-grid">
@@ -50,9 +59,10 @@
                         <p>Sunday: 10:00 AM - 4:00 PM</p>
                     </div>
                 </div>
+                <!--- Contact Container --->
                 <div class="contact-container">
                     <h2>Send us a Message</h2>
-                    <form action="PHP/contact.php" method="POST" class="contact-form">
+                    <form class="contact-form">
                         <div class="form-group">
                             <label for="name">Name</label>
                             <input type="text" id="name" name="name" class="form-control" required>
@@ -77,6 +87,7 @@
             </div>
         </div>
 
+        <!--- Map Section --->
         <div class="map-section">
             <h2>Find Us</h2>
             <div class="map-container">
@@ -125,8 +136,5 @@
             </div>
         </div>
     </footer>
-
-    <!--- JS --->
-    <script src="JS/login.js"></script>
 </body>
 </html> 

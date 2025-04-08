@@ -56,12 +56,25 @@ CREATE TABLE order_items (
     FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
 
+-- Create contact_messages table
+CREATE TABLE contact_messages (
+    message_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    subject VARCHAR(200) NOT NULL,
+    message TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'unread',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Insert sample products
 INSERT INTO products (name, description, price, category, image_url, stock) VALUES
 ('Vitamin C 1000mg', 'High-strength vitamin C supplement', 19.99, 'Vitamins', 'images/PJarr.png', 100),
 ('Pain Relief Tablets 500mg', 'Effective pain relief medication', 12.99, 'Pain Relief', 'images/PPill.png', 150),
 ('First Aid Kit', 'Complete first aid kit for emergencies', 29.99, 'Medical Supplies', 'images/PAid.png', 50),
-('Hand Sanitizer 500ml', 'Antibacterial hand sanitizer', 8.99, 'Personal Care', 'images/PHand.png', 200);
+('Hand Sanitizer 500ml', 'Antibacterial hand sanitizer', 8.99, 'Personal Care', 'images/PHand.png', 200),
+('Multivitamins', 'Daily multivitamin supplement for overall health', 24.99, 'Vitamins and Supplements', 'images/PMult.png', 75),
+('Blood Pressure Monitor', 'Digital blood pressure monitor for home use', 49.99, 'Medical Supplies', 'images/PBlood.png', 30);
 
 -- Insert sample categories
 INSERT INTO categories (name, description) VALUES
@@ -70,7 +83,3 @@ INSERT INTO categories (name, description) VALUES
 ('Vitamins & Supplements', 'Nutritional supplements and vitamins'),
 ('Personal Care', 'Personal care and hygiene products'),
 ('Medical Supplies', 'Medical equipment and supplies');
-
--- Insert sample admin user (password: admin123)
-INSERT INTO users (username, password, email, role) VALUES
-('admin', '$2y$10$8K1p/a0dL1LXMIZoIqPK6.U/BOkNGx1k3hU9V7T3UQH3H5J5J5J5J', 'admin@pharmacy.com', 'admin'); 

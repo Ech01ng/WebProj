@@ -2,6 +2,9 @@
 # Ignore Images directory containing images
 Images/
 
+# Ignore .hintrc file
+.hintrc
+
 # Ignore large files
 *.jpg
 *.jpeg

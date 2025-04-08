@@ -4,10 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products - Nebris Pharmacy</title>
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- CSS -->
     <link rel="stylesheet" href="CSS/style.css">
+    <!--- JS --->
+    <script src="JS/login.js"></script>
+    <script src="JS/cart-sidebar.js"></script>
+    <script src="JS/products.js"></script>
 </head>
 <body>
+    <!--- Navbar --->
     <header>
         <nav class="container">
             <div class="logo">
@@ -18,11 +25,13 @@
                 <li><a href="products.html">Products</a></li>
                 <li><a href="login.html" id="loginLink">Login</a></li>
                 <li><a href="register.html" id="registerLink">Register</a></li>
+                <!-- Failsafe for logout link to be hidden by default -->
                 <li><a href="#" id="logoutLink" style="display: none;">Logout</a></li>
             </ul>
         </nav>
     </header>
 
+    <!--- Main Content --->
     <main class="container main-content">
         <div class="products-header">
             <h1>Our Products</h1>
@@ -118,6 +127,7 @@
         </div>
     </main>
 
+    <!--- Footer --->
     <footer>
         <div class="container">
             <div class="footer-content">
@@ -170,9 +180,5 @@
         <span class="cart-count">0</span>
         <i class="fas fa-shopping-cart"></i>
     </div>
-
-    <!--- JS --->
-    <script src="JS/login.js"></script>
-    <script src="JS/cart-sidebar.js"></script>
 </body>
 </html> 

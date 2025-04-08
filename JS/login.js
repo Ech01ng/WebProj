@@ -1,3 +1,4 @@
+// Purpose of this file is to handle the login and logout functionality
 // Check URL parameters for login success or error messages
 function checkUrlParams() {
     const urlParams = new URLSearchParams(window.location.search);

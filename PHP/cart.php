@@ -45,12 +45,17 @@ function updateCartQuantity($product_id, $quantity) {
     }
 }
 
+// Function to format price in euros
+function formatPrice($price) {
+    return number_format(floatval($price), 2, '.', '');
+}
+
 // Function to get cart contents with product details
 function getCartContents($conn) {
     if (empty($_SESSION['cart'])) {
         return array(
             'items' => array(),
-            'total' => 0,
+            'total' => "0.00",
             'count' => 0
         );
     }
@@ -80,8 +85,8 @@ function getCartContents($conn) {
             }
             
             if ($product = $result->fetch_assoc()) {
-                // Convert price to float
-                $price = floatval($product['price']);
+                // Get raw price values
+                $price = $product['price'];
                 $subtotal = $price * $quantity;
                 $items[] = array(
                     'id' => intval($product['product_id']),
@@ -106,55 +111,30 @@ function getCartContents($conn) {
 
     return array(
         'items' => $items,
-        'total' => floatval($total),
+        'total' => $total,
         'count' => intval($count)
     );
 }
 
-// Function to process checkout
-function processCheckout($user_id, $billing_address, $payment_method, $card_number, $card_expiry, $card_cvv) {
-    global $conn;
+// Function to send JSON response
+function sendJsonResponse($success, $message = '', $data = array()) {
+    $response = array_merge(
+        array(
+            'success' => $success,
+            'message' => $message
+        ),
+        $data
+    );
     
-    // Get cart contents
-    $cart = getCartContents($conn);
-    if (empty($cart['items'])) {
-        return array('success' => false, 'message' => 'Cart is empty');
-    }
-
-    // Start transaction
-    $conn->begin_transaction();
-
-    try {
-        // Create order
-        $stmt = $conn->prepare("INSERT INTO orders (user_id, total_amount, billing_address, payment_method, card_number, card_expiry, card_cvv) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("idsssss", $user_id, $cart['total'], $billing_address, $payment_method, $card_number, $card_expiry, $card_cvv);
-        $stmt->execute();
-        $order_id = $conn->insert_id;
-
-        // Add order items
-        $stmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
-        foreach ($cart['items'] as $item) {
-            $stmt->bind_param("iiid", $order_id, $item['id'], $item['quantity'], $item['price']);
-            $stmt->execute();
-        }
-
-        // Clear cart
-        $_SESSION['cart'] = array();
-
-        // Commit transaction
-        $conn->commit();
-        return array('success' => true);
-    } catch (Exception $e) {
-        // Rollback transaction on error
-        $conn->rollback();
-        return array('success' => false, 'message' => 'Error processing order: ' . $e->getMessage());
-    }
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
 }
 
 // Handle AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $response = array('success' => false);
-    
+
     if (isset($_POST['action'])) {
         try {
             switch ($_POST['action']) {
@@ -264,54 +244,111 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     break;
 
                 case 'checkout':
-                    if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-                        $response = array('success' => false, 'message' => 'Please login to checkout');
-                        break;
+                    // Check if user is logged in
+                    if (!isset($_SESSION['id'])) {
+                        sendJsonResponse(false, 'Please log in to complete your order');
+                        exit;
                     }
-                    
-                    // Log checkout attempt
-                    error_log("Checkout attempt by user: " . $_SESSION['username']);
-                    
+
                     // Validate required fields
-                    $required_fields = ['billing-address', 'payment-method', 'card-number', 'card-expiry', 'card-cvv'];
-                    $missing_fields = array();
-                    
-                    foreach ($required_fields as $field) {
-                        if (!isset($_POST[$field]) || empty($_POST[$field])) {
-                            $missing_fields[] = $field;
+                    if (!isset($_POST['card-number']) || !isset($_POST['card-expiry']) || 
+                        !isset($_POST['card-cvv']) || !isset($_POST['billing-address']) || 
+                        !isset($_POST['payment-method'])) {
+                        sendJsonResponse(false, 'Missing required fields');
+                        exit;
+                    }
+
+                    $cardNumber = trim($_POST['card-number']);
+                    $cardExpiry = trim($_POST['card-expiry']);
+                    $cardCVV = trim($_POST['card-cvv']);
+                    $billingAddress = trim($_POST['billing-address']);
+                    $paymentMethod = trim($_POST['payment-method']);
+
+                    // Server-side validation
+                    $errors = [];
+
+                    // Validate card number
+                    if (!preg_match('/^\d{16}$/', $cardNumber)) {
+                        $errors[] = 'Card number must be 16 digits';
+                    }
+
+                    // Validate CVV
+                    if (!preg_match('/^\d{3}$/', $cardCVV)) {
+                        $errors[] = 'CVV must be 3 digits';
+                    }
+
+                    // Validate expiry date
+                    if (!preg_match('/^(0[1-9]|1[0-2])\/([0-9]{2})$/', $cardExpiry)) {
+                        $errors[] = 'Expiry date must be in MM/YY format';
+                    } else {
+                        list($expiryMonth, $expiryYear) = explode('/', $cardExpiry);
+                        $currentYear = date('y');
+                        $currentMonth = date('m');
+
+                        if ($expiryYear < $currentYear || 
+                            ($expiryYear == $currentYear && $expiryMonth < $currentMonth)) {
+                            $errors[] = 'Card has expired';
                         }
                     }
-                    
-                    if (!empty($missing_fields)) {
-                        error_log("Missing fields in checkout: " . implode(', ', $missing_fields));
-                        $response = array(
-                            'success' => false,
-                            'message' => 'Missing required fields: ' . implode(', ', $missing_fields)
-                        );
-                        break;
+
+                    // Validate payment method
+                    if (!in_array($paymentMethod, ['credit', 'debit'])) {
+                        $errors[] = 'Invalid payment method';
                     }
+
+                    // Validate billing address
+                    if (strlen($billingAddress) < 10) {
+                        $errors[] = 'Billing address must be at least 10 characters long';
+                    }
+
+                    if (!empty($errors)) {
+                        sendJsonResponse(false, 'Validation failed: ' . implode(', ', $errors));
+                        exit;
+                    }
+
+                    // Get cart contents before checkout
+                    $cartData = getCartContents($conn);
                     
+                    // Calculate totals
+                    $subtotal = floatval($cartData['total']);
+                    $tax = formatPrice($subtotal * 0.1); // 10% tax
+                    $total = formatPrice($subtotal * 1.1); // Total with tax
+
                     try {
-                        $response = processCheckout(
-                            $_SESSION['id'],
-                            $_POST['billing-address'],
-                            $_POST['payment-method'],
-                            $_POST['card-number'],
-                            $_POST['card-expiry'],
-                            $_POST['card-cvv']
-                        );
-                        
-                        if ($response['success']) {
-                            error_log("Checkout successful for user: " . $_SESSION['username']);
-                        } else {
-                            error_log("Checkout failed for user: " . $_SESSION['username'] . ". Reason: " . ($response['message'] ?? 'Unknown error'));
+                        // Start transaction
+                        $conn->begin_transaction();
+
+                        // Create order
+                        $stmt = $conn->prepare("INSERT INTO orders (user_id, total_amount, billing_address, payment_method, card_number, card_expiry, card_cvv, created_at, status) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 'pending')");
+                        $stmt->bind_param("idsssss", $_SESSION['id'], $total, $billingAddress, $paymentMethod, $cardNumber, $cardExpiry, $cardCVV);
+                        $stmt->execute();
+                        $orderId = $conn->insert_id;
+
+                        // Add order items
+                        $stmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
+                        foreach ($cartData['items'] as $item) {
+                            $itemPrice = formatPrice($item['price']);
+                            $stmt->bind_param("iiid", $orderId, $item['id'], $item['quantity'], $itemPrice);
+                            $stmt->execute();
                         }
+
+                        // Clear cart
+                        $_SESSION['cart'] = array();
+
+                        // Commit transaction
+                        $conn->commit();
+
+                        sendJsonResponse(true, 'Order placed successfully', array(
+                            'order_id' => $orderId,
+                            'subtotal' => formatPrice($subtotal),
+                            'tax' => $tax,
+                            'total' => $total
+                        ));
                     } catch (Exception $e) {
-                        error_log("Checkout error for user " . $_SESSION['username'] . ": " . $e->getMessage());
-                        $response = array(
-                            'success' => false,
-                            'message' => 'Error processing checkout: ' . $e->getMessage()
-                        );
+                        // Rollback transaction on error
+                        $conn->rollback();
+                        logError("Checkout error: " . $e->getMessage());
+                        sendJsonResponse(false, 'Error processing order: ' . $e->getMessage());
                     }
                     break;
 

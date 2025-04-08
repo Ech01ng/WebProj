@@ -1,3 +1,4 @@
+// Purpose of this file is to handle the cart sidebar functionality
 // Load cart sidebar HTML
 document.addEventListener('DOMContentLoaded', () => {
     setupCartSidebar();
@@ -93,27 +94,29 @@ function displayCartSidebar(data) {
         return;
     }
 
-    // Helper function to format price
-    const formatPrice = (price) => {
-        const num = parseFloat(price);
-        return isNaN(num) ? '0.00' : num.toFixed(2);
-    };
-
     data.items.forEach(item => {
         const itemElement = document.createElement('div');
         itemElement.className = 'cart-sidebar-item';
+        const price = parseFloat(item.price).toFixed(2);
+        const subtotal = parseFloat(item.subtotal).toFixed(2);
+        
+        // This is the HTML for the cart sidebar item
         itemElement.innerHTML = `
-            <img src="${item.image_url || 'images/placeholder.png'}" alt="${item.name}" class="cart-sidebar-item-image">
+            <div class="cart-sidebar-item-image">
+                <img src="${item.image_url || 'images/placeholder.png'}" alt="${item.name}">
+            </div>
             <div class="cart-sidebar-item-details">
                 <div class="cart-sidebar-item-title">${item.name}</div>
-                <div class="cart-sidebar-item-price">$${formatPrice(item.price)} × ${item.quantity}</div>
-                <div class="cart-sidebar-item-total">Total: $${formatPrice(item.subtotal)}</div>
+                <div class="cart-sidebar-item-price">$${price} × ${item.quantity}</div>
+                <div class="cart-sidebar-item-total">Total: $${subtotal}</div>
             </div>
         `;
         cartItems.appendChild(itemElement);
     });
 
-    cartTotal.textContent = `$${formatPrice(data.total)}`;
+    // Update total with proper formatting
+    const total = parseFloat(data.total).toFixed(2);
+    cartTotal.textContent = `$${total}`;
 }
 
 // Update cart count badge

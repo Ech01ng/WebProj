@@ -1,53 +1,48 @@
 <?php
 require_once 'config.php';
+header('Content-Type: application/json');
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = trim($_POST["name"]);
-    $email = trim($_POST["email"]);
-    $subject = trim($_POST["subject"]);
-    $message = trim($_POST["message"]);
-    
-    // Create contacts table if it doesn't exist
-    $sql = "CREATE TABLE IF NOT EXISTS contacts (
-        contact_id INT PRIMARY KEY AUTO_INCREMENT,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(100) NOT NULL,
-        subject VARCHAR(200) NOT NULL,
-        message TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )";
-    
-    if(mysqli_query($conn, $sql)) {
-        // Insert the contact message
-        $sql = "INSERT INTO contacts (name, email, subject, message) VALUES (?, ?, ?, ?)";
-        
-        if($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, "ssss", $name, $email, $subject, $message);
-            
-            if(mysqli_stmt_execute($stmt)) {
-                // Send email notification (you would need to configure your email settings)
-                $to = "admin@pharmacyshop.com";
-                $email_subject = "New Contact Form Submission: " . $subject;
-                $email_body = "Name: $name\n";
-                $email_body .= "Email: $email\n";
-                $email_body .= "Subject: $subject\n\n";
-                $email_body .= "Message:\n$message";
-                
-                $headers = "From: $email";
-                
-                mail($to, $email_subject, $email_body, $headers);
-                
-                // Redirect back to contact page with success message
-                header("location: ../contact.html?status=success");
-            } else {
-                echo "Something went wrong. Please try again later.";
-            }
-            mysqli_stmt_close($stmt);
-        }
-    } else {
-        echo "Error creating table: " . mysqli_error($conn);
-    }
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    die(json_encode(['success' => false, 'message' => 'Method not allowed']));
 }
 
-mysqli_close($conn);
+// Get and sanitize form data
+$name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
+$email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+$subject = filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_STRING);
+$message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
+
+// Validate required fields
+if (!$name || !$email || !$subject || !$message) {
+    http_response_code(400);
+    die(json_encode(['success' => false, 'message' => 'All fields are required']));
+}
+
+// Validate email format
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    http_response_code(400);
+    die(json_encode(['success' => false, 'message' => 'Invalid email format']));
+}
+
+try {
+    // Prepare and execute the SQL query
+    $stmt = $conn->prepare("INSERT INTO contact_messages (name, email, subject, message) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $name, $email, $subject, $message);
+    
+    if ($stmt->execute()) {
+        $stmt->close();
+        $conn->close();
+        die(json_encode(['success' => true, 'message' => 'Message sent successfully']));
+    } else {
+        $stmt->close();
+        $conn->close();
+        throw new Exception('Failed to send message');
+    }
+} catch (Exception $e) {
+    if (isset($stmt)) $stmt->close();
+    if (isset($conn)) $conn->close();
+    http_response_code(500);
+    die(json_encode(['success' => false, 'message' => 'An error occurred while sending your message']));
+}
 ?> 
