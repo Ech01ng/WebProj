@@ -9,6 +9,20 @@ require_once 'config.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Log file path
+$log_file = 'login_debug.log';
+
+// Function to log debug information
+function logDebug($message, $data = null) {
+    global $log_file;
+    $timestamp = date('Y-m-d H:i:s');
+    $log_message = "[$timestamp] $message";
+    if ($data !== null) {
+        $log_message .= ": " . print_r($data, true);
+    }
+    file_put_contents($log_file, $log_message . "\n", FILE_APPEND);
+}
+
 // Function to check login status
 function checkLoginStatus() {
     header('Content-Type: application/json');
@@ -39,6 +53,7 @@ function checkLoginStatus() {
 function handleLogin() {
     global $conn;
     
+    logDebug("Login attempt started");
     header('Content-Type: application/json');
     
     // Ensure session is started
@@ -48,13 +63,18 @@ function handleLogin() {
     
     // Check database connection
     if (!$conn) {
-        echo json_encode(['success' => false, 'error' => 'Database connection failed: ' . mysqli_connect_error()]);
+        $error = mysqli_connect_error();
+        logDebug("Database connection failed", $error);
+        echo json_encode(['success' => false, 'error' => 'Database connection failed: ' . $error]);
         exit;
     }
     
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        logDebug("POST data received", $_POST);
+        
         // Validate input exists
         if (!isset($_POST["username"]) || !isset($_POST["password"])) {
+            logDebug("Missing username or password");
             echo json_encode(['success' => false, 'error' => 'Username and password are required']);
             exit;
         }

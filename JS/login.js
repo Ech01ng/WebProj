@@ -110,7 +110,7 @@ function handleLogout(event) {
 
 // Add event listeners when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Check login status immediately
+    // Check login status immediately since navbar is in the HTML
     checkLoginStatus();
     
     // Setup login form if it exists
@@ -126,9 +126,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Export functions for use in other files
-window.checkLoginStatus = checkLoginStatus;
-window.handleLogout = handleLogout;
-
 // Check login status periodically
-setInterval(checkLoginStatus, 30000); // Check every 30 seconds 
+setInterval(checkLoginStatus, 60000); // Check every minute 
