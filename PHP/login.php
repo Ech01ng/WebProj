@@ -1,6 +1,8 @@
 <?php
 // Start the session
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Include database configuration
 require_once 'config.php';
@@ -27,23 +29,19 @@ function logDebug($message, $data = null) {
 function checkLoginStatus() {
     header('Content-Type: application/json');
     
-    // Ensure session is started
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-    
     // Debug information
     $debug = [
         'session_id' => session_id(),
         'session_status' => session_status(),
-        'session_data' => $_SESSION
+        'session_data' => $_SESSION,
+        'cookies' => $_COOKIE
     ];
     
-    $response = array(
+    $response = [
         'loggedin' => isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true,
         'username' => isset($_SESSION["username"]) ? $_SESSION["username"] : null,
         'debug' => $debug
-    );
+    ];
     
     echo json_encode($response);
     exit;
@@ -53,28 +51,11 @@ function checkLoginStatus() {
 function handleLogin() {
     global $conn;
     
-    logDebug("Login attempt started");
     header('Content-Type: application/json');
     
-    // Ensure session is started
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
-    
-    // Check database connection
-    if (!$conn) {
-        $error = mysqli_connect_error();
-        logDebug("Database connection failed", $error);
-        echo json_encode(['success' => false, 'error' => 'Database connection failed: ' . $error]);
-        exit;
-    }
-    
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        logDebug("POST data received", $_POST);
-        
         // Validate input exists
         if (!isset($_POST["username"]) || !isset($_POST["password"])) {
-            logDebug("Missing username or password");
             echo json_encode(['success' => false, 'error' => 'Username and password are required']);
             exit;
         }
@@ -89,7 +70,7 @@ function handleLogin() {
         
         try {
             // Prepare a select statement
-            $sql = "SELECT id, username, password, role FROM users WHERE username = ?";
+            $sql = "SELECT id, username, password FROM users WHERE username = ?";
             
             if($stmt = mysqli_prepare($conn, $sql)) {
                 mysqli_stmt_bind_param($stmt, "s", $username);
@@ -98,23 +79,23 @@ function handleLogin() {
                     mysqli_stmt_store_result($stmt);
                     
                     if(mysqli_stmt_num_rows($stmt) == 1) {
-                        mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password, $role);
+                        mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password);
                         if(mysqli_stmt_fetch($stmt)) {
                             if(password_verify($password, $hashed_password)) {
-                                // Clear any existing session data
-                                session_unset();
+                                // Password is correct, start a new session
+                                session_regenerate_id(true);
                                 
                                 // Store data in session variables
                                 $_SESSION["loggedin"] = true;
                                 $_SESSION["id"] = $id;
                                 $_SESSION["username"] = $username;
-                                $_SESSION["role"] = $role;
                                 
                                 // Debug information
                                 $debug = [
                                     'session_id' => session_id(),
                                     'session_status' => session_status(),
-                                    'session_data' => $_SESSION
+                                    'session_data' => $_SESSION,
+                                    'cookies' => $_COOKIE
                                 ];
                                 
                                 echo json_encode([
@@ -151,13 +132,13 @@ function handleLogin() {
 
 // Function to handle logout
 function handleLogout() {
-    // Ensure session is started
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
+    // Clear all session variables
+    $_SESSION = array();
     
-    // Unset all of the session variables
-    session_unset();
+    // Destroy the session cookie
+    if (isset($_COOKIE[session_name()])) {
+        setcookie(session_name(), '', time() - 3600, '/');
+    }
     
     // Destroy the session
     session_destroy();
