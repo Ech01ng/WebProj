@@ -83,3 +83,7 @@ INSERT INTO categories (name, description) VALUES
 ('Vitamins & Supplements', 'Nutritional supplements and vitamins'),
 ('Personal Care', 'Personal care and hygiene products'),
 ('Medical Supplies', 'Medical equipment and supplies');
+
+-- Insert Test User
+INSERT INTO users (username, email, password, role) VALUES
+('testuser', 'testuser@example.com', 'test123', 'test');
