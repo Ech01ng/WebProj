@@ -757,3 +757,24 @@ footer {
     padding-top: 1rem;
     border-top: 1px solid rgba(255,255,255,0.1);
 }
+
+/* --- Contact Page Cards --- */
+.contact-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+.contact-cards .product-card {
+    flex: 1 1 220px;
+    min-width: 220px;
+    max-width: 300px;
+    text-align: center;
+}
+.contact-cards .product-card .contact-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: #3498db;
+}
+/* --- End Contact Page Cards --- */

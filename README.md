@@ -12,7 +12,8 @@ This is a full-stack Pharmacy website built with HTML, CSS, JavaScript, and PHP.
 
 - You will notice that there are a lot of files in this project, this is due to me being more accustomed to programming with react and following some object oriented programming concepts.
 - Hence there are many files that all have their role in the project.
-- Under the PHP files, any echo XYZ, is used for debugging as it will print the message to the console when it gets triggered.
+- Under the PHP files, any "echo XYZ", is used for debugging as it will print the message to the console when it gets triggered.
+- Some stuff like the "Render the orders" in the orders.js were done like that simply because I was loosing my mind trying to get it to work in another way (I sorta gave up doing it one way and went with a simpler alternative)
 
 ### Files
 
@@ -49,9 +50,9 @@ The website must contain
 6. Add content to the database
    - Register page, Contact page and Cart Page does this.
 7. Edit content to the database
-   - Cart page has a tab for increasing amount of the same product to be purchased which edits the database with quantity.
+   - Orders page has a button for changing billing address, this gets updated once the user confirms it.
 8. Delete content to the database
-   - Orders page allows the user to see all their orders and "cancel" any of them, when canceling it deletes the entry from the database
+   - Orders page allows the user to see all their orders and "cancel" any of them, when canceling it deletes the entry from the database.
 
 ## Features
 
