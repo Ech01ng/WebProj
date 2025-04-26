@@ -37,12 +37,14 @@ function checkLoginStatus() {
         'cookies' => $_COOKIE
     ];
     
+    // Check if the user is logged in
     $response = [
         'loggedin' => isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true,
         'username' => isset($_SESSION["username"]) ? $_SESSION["username"] : null,
         'debug' => $debug
     ];
     
+    // Log the response
     echo json_encode($response);
     exit;
 }
@@ -51,8 +53,10 @@ function checkLoginStatus() {
 function handleLogin() {
     global $conn;
     
+    // Set the content type to application/json
     header('Content-Type: application/json');
     
+    // Check if the request method is POST
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Validate input exists
         if (!isset($_POST["username"]) || !isset($_POST["password"])) {
@@ -60,27 +64,34 @@ function handleLogin() {
             exit;
         }
         
+        // Trim the username and password
         $username = trim($_POST["username"]);
         $password = $_POST["password"];
         
+        // Check if the username and password are empty
         if(empty($username) || empty($password)) {
             echo json_encode(['success' => false, 'error' => 'Please enter both username and password']);
             exit;
         }
         
+        // Try to prepare a select statement
         try {
             // Prepare a select statement
             $sql = "SELECT id, username, password FROM users WHERE username = ?";
-            
+            // Check if the statement was prepared successfully
             if($stmt = mysqli_prepare($conn, $sql)) {
+                // Bind the username to the statement
                 mysqli_stmt_bind_param($stmt, "s", $username);
-                
+                // Execute the statement
                 if(mysqli_stmt_execute($stmt)) {
                     mysqli_stmt_store_result($stmt);
-                    
+                    // Check if the statement has one row
                     if(mysqli_stmt_num_rows($stmt) == 1) {
+                        // Bind the result to the variables
                         mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password);
+                        // Fetch the result
                         if(mysqli_stmt_fetch($stmt)) {
+                            // Check if the password is correct
                             if(password_verify($password, $hashed_password)) {
                                 // Password is correct, start a new session
                                 session_regenerate_id(true);
@@ -116,6 +127,7 @@ function handleLogin() {
                     throw new Exception(mysqli_error($conn));
                 }
                 
+                // Close the statement
                 mysqli_stmt_close($stmt);
             } else {
                 throw new Exception(mysqli_error($conn));

@@ -2,6 +2,11 @@
 // Check URL parameters for login success or error messages
 function checkUrlParams() {
     const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('register') === 'success') {
+        alert('Registration successful! Please log in.');
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
+    }
     if (urlParams.get('login') === 'success') {
         alert('Login successful!');
         window.history.replaceState({}, document.title, window.location.pathname);
@@ -86,6 +91,22 @@ function checkLoginStatus() {
         return response.json();
     })
     .then(data => {
+        // Only show alerts if not on the registration page
+        if (window.location.pathname.includes('register.html')) {
+            // Just update UI, do not show alerts
+            if (data.loggedin) {
+                loginLink.style.display = 'none';
+                registerLink.style.display = 'none';
+                logoutLink.style.display = 'inline-block';
+                localStorage.setItem('isLoggedIn', 'true');
+            } else {
+                loginLink.style.display = 'inline-block';
+                registerLink.style.display = 'inline-block';
+                logoutLink.style.display = 'none';
+                localStorage.removeItem('isLoggedIn');
+            }
+            return;
+        }
         console.log('Login status response:', data);
 
         if (data.loggedin) {
@@ -138,6 +159,10 @@ function handleLogout(event) {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing login functionality');
     
+    // Only check URL params on the login page
+    if (window.location.pathname.includes('login.html')) {
+        checkUrlParams();
+    }
     // Check login status immediately
     checkLoginStatus();
     

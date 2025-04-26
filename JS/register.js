@@ -34,34 +34,48 @@ document.addEventListener('DOMContentLoaded', function() {
         const isPasswordValid = validatePassword(password);
         const isConfirmPasswordValid = validateConfirmPassword(confirmPassword, password);
 
+        // Check if all fields are valid
         if (isUsernameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid) {
             try {
+                // Create a FormData object from the form
                 const formData = new FormData(this);
+                // Send the form data to the server
                 const response = await fetch('PHP/register.php', {
                     method: 'POST',
                     body: formData
                 });
-
-                const text = await response.text();
-                
-                // Check if response contains any error messages
-                if (text.includes('already taken') || text.includes('already registered')) {
-                    // Handle server-side validation errors
-                    if (text.includes('username is already taken')) {
-                        showValidationMessage(username, 'This username is already taken', false);
+                // Get the response
+                const data = JSON.parse(await response.text());
+                // Log the response
+                console.log('Registration response:', data);
+                // Check if the registration was successful
+                if (data.success) {
+                    // Redirect to the login page
+                    window.location.href = data.redirect || 'login.html';
+                } else if (data.errors) {
+                    // Check if the username is already taken
+                    if (data.errors.some(e => e.toLowerCase().includes('username'))) {
+                        showValidationMessage(username, data.errors.find(e => e.toLowerCase().includes('username')), false);
                     }
-                    if (text.includes('email is already registered')) {
-                        showValidationMessage(email, 'This email is already registered', false);
+                    // Check if the email is already registered
+                    if (data.errors.some(e => e.toLowerCase().includes('email'))) {
+                        showValidationMessage(email, data.errors.find(e => e.toLowerCase().includes('email')), false);
                     }
-                } else if (text.includes('login.html')) {
-                    // Registration successful, redirect to login
-                    window.location.href = 'login.html';
+                    // Check if the password is not valid
+                    if (data.errors.some(e => e.toLowerCase().includes('password'))) {
+                        showValidationMessage(password, data.errors.find(e => e.toLowerCase().includes('password')), false);
+                    }
+                    // Check if the passwords do not match
+                    if (data.errors.some(e => e.toLowerCase().includes('match'))) {
+                        showValidationMessage(confirmPassword, data.errors.find(e => e.toLowerCase().includes('match')), false);
+                    }
                 } else {
-                    // Handle other errors
+                    // Show an error message
                     alert('An error occurred. Please try again later.');
                 }
             } catch (error) {
                 console.error('Error:', error);
+                // Show an error message
                 alert('An error occurred. Please try again later.');
             }
         }

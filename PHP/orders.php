@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Fetch items for this order
             $items = [];
             // Prepare the SQL statement
-            $item_stmt = $conn->prepare("SELECT oi.*, p.name FROM order_items oi JOIN products p ON oi.product_id = p.product_id WHERE oi.order_id = ?");
+            $item_stmt = $conn->prepare("SELECT oi.*, p.name, p.image_url FROM order_items oi JOIN products p ON oi.product_id = p.product_id WHERE oi.order_id = ?");
             // Bind the order ID to the statement
             $item_stmt->bind_param('i', $order['order_id']);
             // Execute the statement
@@ -45,7 +45,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Add the quantity of the item to the items
                     'quantity' => $item['quantity'],
                     // Add the price of the item to the items
-                    'price' => $item['price']
+                    'price' => $item['price'],
+                    // Add the image URL of the item to the items
+                    'image_url' => $item['image_url']
                 ];
             }
             $orders[] = [
@@ -81,6 +83,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Delete order
         $conn->query("DELETE FROM orders WHERE order_id = $order_id");
         sendJson(true, ['message' => 'Order cancelled and deleted.']);
+    } elseif ($action === 'get_order_details' && isset($_POST['order_id'])) {
+        $order_id = intval($_POST['order_id']);
+        // Check if order belongs to user
+        $stmt = $conn->prepare("SELECT * FROM orders WHERE order_id = ? AND user_id = ?");
+        $stmt->bind_param('ii', $order_id, $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows === 0) {
+            sendJson(false, ['message' => 'Order not found or not yours.']);
+        }
+        $order = $result->fetch_assoc();
+        sendJson(true, ['order' => $order]);
+    } elseif ($action === 'update_order' && isset($_POST['order_id'])) {
+        $order_id = intval($_POST['order_id']);
+        // Check if order belongs to user
+        $stmt = $conn->prepare("SELECT * FROM orders WHERE order_id = ? AND user_id = ?");
+        $stmt->bind_param('ii', $order_id, $user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows === 0) {
+            sendJson(false, ['message' => 'Order not found or not yours.']);
+        }
+
+        // Update order details
+        $stmt = $conn->prepare("UPDATE orders SET 
+            billing_address = ?
+            WHERE order_id = ? AND user_id = ?");
+        
+        $stmt->bind_param('sii', 
+            $_POST['billing_address'],
+            $order_id,
+            $user_id
+        );
+
+        if ($stmt->execute()) {
+            sendJson(true, ['message' => 'Order updated successfully.']);
+        } else {
+            sendJson(false, ['message' => 'Could not update order.']);
+        }
     } else {
         sendJson(false, ['message' => 'Invalid action or missing parameters.']);
     }

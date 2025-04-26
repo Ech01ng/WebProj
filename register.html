@@ -98,5 +98,12 @@
             </div>
         </div>
     </footer>
+
+    <!--- Prevent alerts on the registration page Just Guarantees it this way --->
+    <script>
+    if (window.location.pathname.includes('register.html')) {
+        window.alert = function() {};
+    }
+    </script>
 </body>
 </html> 

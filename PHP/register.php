@@ -59,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo json_encode([
                     'success' => true,
                     'message' => 'Registration successful',
-                    'redirect' => 'login.html'
+                    'redirect' => 'login.html?register=success'
                 ]);
                 exit;
             } else {

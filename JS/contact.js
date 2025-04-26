@@ -62,16 +62,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // Real-time validation
     const emailInput = contactForm.querySelector('input[name="email"]');
     if (emailInput) {
+        // Add an event listener to the input
         emailInput.addEventListener('input', function() {
+            // Check if the input is valid
             const isValid = emailInput.checkValidity();
+            // Toggle the invalid class
             emailInput.classList.toggle('is-invalid', !isValid);
         });
     }
     
+    // Real-time validation
     const requiredInputs = contactForm.querySelectorAll('input[required], textarea[required]');
     requiredInputs.forEach(input => {
+        // Add an event listener to the input
         input.addEventListener('blur', function() {
+            // Check if the input is valid
             const isValid = input.value.trim() !== '';
+            // Toggle the invalid class
             input.classList.toggle('is-invalid', !isValid);
         });
     });

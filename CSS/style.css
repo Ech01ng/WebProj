@@ -148,6 +148,26 @@ nav {
     background-color: #2980b9;
 }
 
+/* Cancel Order button style */
+.btn-delete {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #c0392b;
+}
+
+/* Edit button style */
+.btn-edit {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #2980b9;
+}
+
 /* Table Styles */
 .table {
     width: 100%;

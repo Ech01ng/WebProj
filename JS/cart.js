@@ -3,34 +3,47 @@
 // Function to load cart contents
 function loadedCart() {
     fetch('PHP/cart.php', {
+        // Set the method to POST
         method: 'POST',
+        // Set the content type to application/x-www-form-urlencoded
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
+        // Set the body to the action get
         body: 'action=get'
     })
+    // Get the response
     .then(response => response.json())
+    // Parse the response
     .then(data => {
+        // Check if the cart was loaded successfully
         if (data.success) {
+            // Update the cart display
             updateCartDisplay(data);
         } else {
+            // Show the error message
             console.error('Error loading cart:', data.error);
         }
     })
     .catch(error => {
+        // Show the error message
         console.error('Error:', error);
     });
 }
 
+// Load cart on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Load cart on page load
     loadedCart();
 
     // Add event listeners for cart actions
     document.addEventListener('click', function(e) {
+        // Check if the target has the class add-to-cart
         if (e.target.classList.contains('add-to-cart')) {
+            // Get the product ID from the data-product-id attribute
             const productId = e.target.dataset.productId;
+            // Get the quantity from the quantity input
             const quantity = document.querySelector(`#quantity-${productId}`).value;
+            // Add the item to the cart
             addToCart(productId, quantity);
         }
     });
@@ -54,7 +67,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.value = this.value.slice(0, 16);
             }
 
+            // Validate the card number
             const validation = validateCardNumber(this.value);
+            // Show the validation message
             showValidationMessage(this, validation.message, validation.isValid);
         });
     }
@@ -88,16 +103,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Validate the billing address
     if (billingAddressInput) {
         billingAddressInput.addEventListener('input', function() {
             const validation = validateBillingAddress(this.value);
+            // Show the validation message
             showValidationMessage(this, validation.message, validation.isValid);
         });
     }
 
+    // Validate the payment method
     if (paymentMethodInput) {
         paymentMethodInput.addEventListener('change', function() {
             const validation = validatePaymentMethod(this.value);
+            // Show the validation message
             showValidationMessage(this, validation.message, validation.isValid);
         });
     }
