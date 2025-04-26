@@ -1,7 +1,30 @@
 // Purpose of this file is to handle the cart functionality
+
+// Function to load cart contents
+function loadedCart() {
+    fetch('PHP/cart.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'action=get'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateCartDisplay(data);
+        } else {
+            console.error('Error loading cart:', data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Load cart on page load
-    loadCart();
+    loadedCart();
 
     // Add event listeners for cart actions
     document.addEventListener('click', function(e) {
@@ -121,28 +144,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
-// Function to load cart contents
-function loadCart() {
-    fetch('PHP/cart.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'action=get'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            updateCartDisplay(data);
-        } else {
-            console.error('Error loading cart:', data.error);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
 
 // Function to add item to cart
 function addToCart(productId, quantity) {
