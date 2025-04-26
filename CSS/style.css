@@ -329,10 +329,11 @@ nav {
     border: 0;
 }
 
-/* Hide logout link by default */
+/* Hide links by default */
 #logoutLink {
     display: none;
 }
+
 
 /* Cart Styles */
 .cart-section {

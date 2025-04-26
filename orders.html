@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Nebris Pharmacy</title>
+    <title>My Orders - Nebris Pharmacy</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- CSS -->
     <link rel="stylesheet" href="CSS/style.css">
     <!-- JS -->
     <script src="JS/login.js"></script>
-    <script src="JS/register.js"></script>
+    <script src="JS/orders.js?v=1"></script>
 </head>
 <body>
-
     <!--- Navbar --->
     <header>
         <nav class="container">
@@ -30,44 +29,15 @@
             </ul>
         </nav>
     </header>
-
     <!--- Main Content --->
     <main class="container main-content">
-        <!--- Register Container --->
-        <div class="form-container">
-            <h2>Create an Account</h2>
-            <br>
-            <form class="form-style">
-                <div class="form-row">
-                    <div class="form-group col-50">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" class="form-control" required>
-                    </div>
-                    <div class="form-group col-50">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" class="form-control" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-50">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" class="form-control" required>
-                    </div>
-                    <div class="form-group col-50">
-                        <label for="confirm_password">Confirm Password</label>
-                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Register</button>
-                </div>
-                <div class="form-group">
-                    <p class="link">Already have an account? <a href="login.html">Login here</a></p>
-                </div>
-            </form>
+        <h2>My Orders</h2>
+        <div id="orders-message"></div>
+        <button id="login-redirect-btn" class="btn btn-primary" style="display:none; margin-top: 1em;">Login to view your orders</button>
+        <div id="orders-list">
+            <!-- Orders will be loaded here dynamically -->
         </div>
     </main>
-
     <!--- Footer --->
     <footer>
         <div class="container">
@@ -98,5 +68,21 @@
             </div>
         </div>
     </footer>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('PHP/login.php?action=check', { credentials: 'include' })
+          .then(response => response.json())
+          .then(data => {
+            if (!data.loggedin) {
+              document.getElementById('orders-message').textContent = 'Please login to view your orders.';
+              document.getElementById('login-redirect-btn').style.display = 'inline-block';
+              document.getElementById('orders-list').style.display = 'none';
+            }
+          });
+        document.getElementById('login-redirect-btn').onclick = function() {
+          window.location.href = 'login.html?redirect=orders.html';
+        };
+    });
+    </script>
 </body>
 </html> 
