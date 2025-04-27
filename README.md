@@ -13,6 +13,7 @@ This is a full-stack Pharmacy website built with HTML, CSS, JavaScript, and PHP.
 - You will notice that there are a lot of files in this project, this is due to me being more accustomed to programming with react and following some object oriented programming concepts.
 - Hence there are many files that all have their role in the project.
 - Under the PHP files, any "echo XYZ", is used for debugging as it will print the message to the console when it gets triggered.
+- Under the JS files, any "console.XYZ" is used for debugging as it will print the message to the console when it gets triggered.
 - Some stuff like the "Render the orders" in the orders.js were done like that simply because I was loosing my mind trying to get it to work in another way (I sorta gave up doing it one way and went with a simpler alternative)
 
 ### Files

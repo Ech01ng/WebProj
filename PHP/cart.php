@@ -9,7 +9,8 @@ ini_set('display_errors', 1);
 
 /**
  * Log error messages to the server's error log
- * @param string $message Error message to log
+ * parameters:
+ * string $message Error message to log
  */
 function logError($message) {
     error_log(date('Y-m-d H:i:s') . " - Cart Error: " . $message);
@@ -20,12 +21,7 @@ if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = array();
 }
 
-/**
- * Add a product to the cart
- * @param int $product_id Product ID to add
- * @param int $quantity Quantity to add (default: 1)
- * @return bool True if successful
- */
+// Add a product to the cart
 function addToCart($product_id, $quantity = 1) {
     if (isset($_SESSION['cart'][$product_id])) {
         $_SESSION['cart'][$product_id] += $quantity; // Increment existing quantity
@@ -35,11 +31,7 @@ function addToCart($product_id, $quantity = 1) {
     return true;
 }
 
-/**
- * Remove a product from the cart
- * @param int $product_id Product ID to remove
- * @return bool True if successful, False if product not found
- */
+// Remove a product from the cart
 function removeFromCart($product_id) {
     if (isset($_SESSION['cart'][$product_id])) {
         unset($_SESSION['cart'][$product_id]);
@@ -48,12 +40,7 @@ function removeFromCart($product_id) {
     return false;
 }
 
-/**
- * Update quantity of a cart item
- * @param int $product_id Product ID to update
- * @param int $quantity New quantity
- * @return bool True if successful
- */
+// Update quantity of a cart item
 function updateCartQuantity($product_id, $quantity) {
     if ($quantity > 0) {
         $_SESSION['cart'][$product_id] = $quantity;
@@ -63,20 +50,12 @@ function updateCartQuantity($product_id, $quantity) {
     }
 }
 
-/**
- * Format price with 2 decimal places
- * @param float Price to format
- * @return string Formatted price
- */
+// Format price with 2 decimal places
 function formatPrice($price) {
     return number_format(floatval($price), 2, '.', '');
 }
 
-/**
- * Get complete cart contents with product details
- * @param mysqli $conn Database connection
- * @return array Cart data including items, total and count
- */
+// Get complete cart contents with product details
 function getCartContents($conn) {
     // Return empty cart if no items
     if (empty($_SESSION['cart'])) {
@@ -152,12 +131,7 @@ function getCartContents($conn) {
     );
 }
 
-/**
- * Send JSON response to client
- * @param bool $success Whether the operation was successful
- * @param string $message Optional message
- * @param array $data Additional data to include in response
- */
+// Send JSON response to client
 function sendJsonResponse($success, $message = '', $data = array()) {
     $response = array_merge(
         array(
@@ -308,6 +282,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         exit;
                     }
 
+                    // Get the card number, expiry, CVV, billing address, and payment method
                     $cardNumber = trim($_POST['card-number']);
                     $cardExpiry = trim($_POST['card-expiry']);
                     $cardCVV = trim($_POST['card-cvv']);

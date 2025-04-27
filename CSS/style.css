@@ -758,7 +758,7 @@ footer {
     border-top: 1px solid rgba(255,255,255,0.1);
 }
 
-/* --- Contact Page Cards --- */
+/* Contact Page Cards */
 .contact-cards {
     display: flex;
     flex-wrap: wrap;
@@ -777,4 +777,3 @@ footer {
     margin-bottom: 0.5rem;
     color: #3498db;
 }
-/* --- End Contact Page Cards --- */

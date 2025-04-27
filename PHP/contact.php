@@ -40,9 +40,12 @@ try {
         throw new Exception('Failed to send message');
     }
 } catch (Exception $e) {
+    // Close the statement and connection
     if (isset($stmt)) $stmt->close();
     if (isset($conn)) $conn->close();
+    // Send a 500 error
     http_response_code(500);
+    // Send a JSON response
     die(json_encode(['success' => false, 'message' => 'An error occurred while sending your message']));
 }
 ?> 
