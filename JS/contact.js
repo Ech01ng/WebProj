@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get the form
     const contactForm = document.querySelector('.contact-form');
     if (!contactForm) {
-        console.error('Contact form not found');
+        console.error('Hmm, can\'t find the contact form anywhere!');
         return;
     }
     
@@ -45,14 +45,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             // Show success message
-            showNotification("Message sent successfully!", "success");
+            showNotification("Got it! We'll get back to you soon!", "success");
             
             // Clear form
             this.reset();
             
         } catch (error) {
-            console.error('Error:', error);
-            showNotification('An error occurred. Please try again later.', 'error');
+            console.error('Oops! Something went wrong:', error);
+            showNotification('Hmm, having trouble sending your message. Mind trying again?', 'error');
         }
         
         // Re-enable submit button

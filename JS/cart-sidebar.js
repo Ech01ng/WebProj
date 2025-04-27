@@ -14,7 +14,7 @@ function setupCartSidebar() {
 
     // Verify all required elements exist
     if (!cartIcon || !cartSidebar || !cartOverlay || !closeBtn) {
-        console.error('Cart elements not found');
+        console.error('Hmm, can\'t find the cart buttons and stuff');
         return;
     }
 
@@ -60,21 +60,21 @@ function loadCartSidebar() {
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error('Oops! Can\'t connect to the server right now');
         }
         return response.json();
     })
     .then(data => {
-        console.log('Cart data:', data); // Debug log
+        console.log('Here\'s what\'s in your cart:', data); // Debug log
         if (data.success) {
             displayCartSidebar(data);
             updateCartCount(data.count);
         } else {
-            console.error('Failed to load cart:', data);
+            console.error('Hmm, couldn\'t load your cart:', data);
         }
     })
     .catch(error => {
-        console.error('Error loading cart:', error);
+        console.error('Oops! Something went wrong with your cart:', error);
     });
 }
 
@@ -84,7 +84,7 @@ function displayCartSidebar(data) {
     const cartTotal = document.getElementById('cart-sidebar-total');
     
     if (!cartItems || !cartTotal) {
-        console.error('Cart elements not found');
+        console.error('Hmm, can\'t find your cart items');
         return;
     }
     
@@ -92,7 +92,7 @@ function displayCartSidebar(data) {
 
     // Show empty cart message if no items
     if (!data.items || data.items.length === 0) {
-        cartItems.innerHTML = '<p class="empty-cart-message">Your cart is empty</p>';
+        cartItems.innerHTML = '<p class="empty-cart-message">Your cart is looking a bit empty 🛒</p>';
         cartTotal.textContent = '$0.00';
         return;
     }
@@ -128,15 +128,15 @@ function updateCartCount(count = 0) {
     const cartCount = document.querySelector('.cart-count');
     if (cartCount) {
         cartCount.textContent = count.toString();
-        console.log('Updated cart count:', count); // Debug log
+        console.log('Your cart now has', count, 'items'); // Debug log
     } else {
-        console.error('Cart count element not found');
+        console.error('Hmm, can\'t find the cart counter');
     }
 }
 
 // Add item to cart
 function addToCart(productId, quantity = 1) {
-    console.log('Adding to cart:', { productId, quantity }); // Debug log
+    console.log('Adding some goodies to your cart:', { productId, quantity }); // Debug log
     
     // Prepare form data for cart addition
     const formData = new FormData();
@@ -150,20 +150,20 @@ function addToCart(productId, quantity = 1) {
         body: formData
     })
     .then(response => {
-        console.log('Response status:', response.status); // Debug log
+        console.log('Server says:', response.status); // Debug log
         if (!response.ok) {
             return response.text().then(text => {
-                console.error('Error response:', text); // Debug log
-                throw new Error('Network response was not ok: ' + text);
+                console.error('Oops! Server said:', text); // Debug log
+                throw new Error('Hmm, server\'s not happy: ' + text);
             });
         }
         return response.json().catch(error => {
-            console.error('JSON parse error:', error); // Debug log
-            throw new Error('Invalid JSON response');
+            console.error('Hmm, got some weird data:', error); // Debug log
+            throw new Error('Oops! Got some weird data back');
         });
     })
     .then(data => {
-        console.log('Add to cart response:', data); // Debug log
+        console.log('Here\'s what the server said:', data); // Debug log
         if (data.success) {
             // Update cart display and open sidebar
             displayCartSidebar(data);
@@ -176,12 +176,12 @@ function addToCart(productId, quantity = 1) {
                 cartOverlay.classList.add('show');
             }
         } else {
-            console.error('Failed to add to cart:', data.error || 'Unknown error');
-            alert('Failed to add product to cart: ' + (data.error || 'Unknown error'));
+            console.error('Oops! Couldn\'t add that to your cart:', data.error || 'Something went wrong');
+            alert('Hmm, couldn\'t add that to your cart: ' + (data.error || 'Something went wrong'));
         }
     })
     .catch(error => {
-        console.error('Error adding to cart:', error.message);
-        alert('An error occurred while adding to cart: ' + error.message);
+        console.error('Oops! Something went wrong:', error.message);
+        alert('Sorry, having trouble with your cart right now: ' + error.message);
     });
 } 

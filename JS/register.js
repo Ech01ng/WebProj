@@ -84,41 +84,58 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function addValidationMessage(element) {
     if (!element.nextElementSibling?.classList.contains('validation-message')) {
+        // Create a message div
         const messageDiv = document.createElement('div');
+        // Add the validation-message class to the message div
         messageDiv.className = 'validation-message';
+        // Insert the message div before the element
         element.parentNode.insertBefore(messageDiv, element.nextSibling);
     }
 }
 
 function showValidationMessage(inputElement, message, isValid = false) {
+    // Get the message div
     const messageDiv = inputElement.nextElementSibling;
+    // Check if the message div exists and has the validation-message class
     if (messageDiv && messageDiv.classList.contains('validation-message')) {
+        // Set the text content of the message div
         messageDiv.textContent = message;
+        // Set the color of the message div
         messageDiv.style.color = isValid ? '#28a745' : '#dc3545';
         inputElement.style.borderColor = isValid ? '#28a745' : '#dc3545';
     }
     return isValid;
 }
 
+// Validate the username
 function validateUsername(username) {
+    // Get the value of the username
     const value = username.value.trim();
+    // Check if the value is empty
     if (!value) {
         return showValidationMessage(username, 'Username is required', false);
     }
+    // Check if the value is less than 3 characters
     if (value.length < 3) {
         return showValidationMessage(username, 'Username must be at least 3 characters', false);
     }
+    // Check if the value contains only letters, numbers and underscores
     if (!/^[a-zA-Z0-9_]+$/.test(value)) {
         return showValidationMessage(username, 'Username can only contain letters, numbers and underscores', false);
     }
+    // Return true if the value is valid
     return showValidationMessage(username, '', true);
 }
 
+// Validate the email
 function validateEmail(email) {
+    // Get the value of the email
     const value = email.value.trim();
+    // Check if the value is empty
     if (!value) {
         return showValidationMessage(email, 'Email is required', false);
     }
+    // Check if the value is a valid email address
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(value)) {
         return showValidationMessage(email, 'Please enter a valid email address', false);
@@ -126,24 +143,34 @@ function validateEmail(email) {
     return showValidationMessage(email, '', true);
 }
 
+// Validate the password
 function validatePassword(password) {
+    // Get the value of the password
     const value = password.value;
+    // Check if the value is empty
     if (!value) {
         return showValidationMessage(password, 'Password is required', false);
     }
+    // Check if the value is less than 6 characters
     if (value.length < 6) {
         return showValidationMessage(password, 'Password must be at least 6 characters', false);
     }
+    // Return true if the value is valid
     return showValidationMessage(password, '', true);
 }
 
+// Validate the confirm password
 function validateConfirmPassword(confirmPassword, password) {
+    // Get the value of the confirm password
     const value = confirmPassword.value;
+    // Check if the value is empty
     if (!value) {
         return showValidationMessage(confirmPassword, 'Please confirm your password', false);
     }
+    // Check if the value is not the same as the password
     if (value !== password.value) {
         return showValidationMessage(confirmPassword, 'Passwords do not match', false);
     }
+    // Return true if the value is valid
     return showValidationMessage(confirmPassword, '', true);
 } 

@@ -22,12 +22,12 @@ function loadedCart() {
             updateCartDisplay(data);
         } else {
             // Show the error message
-            console.error('Error loading cart:', data.error);
+            console.error('Oops! Can\'t load your cart right now:', data.error);
         }
     })
     .catch(error => {
         // Show the error message
-        console.error('Error:', error);
+        console.error('Hmm, something went wrong:', error);
     });
 }
 
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (checkoutForm) {
         checkoutForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            console.log('Form submission intercepted');
+            console.log('Hey, someone\'s trying to check out!');
 
             // Validate all fields
             const cardNumberValidation = validateCardNumber(cardNumberInput.value);
@@ -147,12 +147,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 !cardCVVValidation.isValid || 
                 !billingAddressValidation.isValid || 
                 !paymentMethodValidation.isValid) {
-                console.log('Validation failed');
+                console.log('Hmm, some fields need attention');
                 return;
             }
 
             // If all validations pass, proceed with checkout
-            console.log('All validations passed, proceeding with checkout');
+            console.log('All good! Let\'s process your order');
             checkout(
                 cardNumberInput.value,
                 cardExpiryInput.value,
@@ -177,14 +177,14 @@ function addToCart(productId, quantity) {
     .then(data => {
         if (data.success) {
             updateCartDisplay(data);
-            alert('Product added to cart!');
+            alert('Added to your cart! 🛒');
         } else {
-            alert('Error adding product to cart: ' + data.error);
+            alert('Oops! Couldn\'t add that to your cart: ' + data.error);
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Error adding product to cart');
+        console.error('Hmm, something went wrong:', error);
+        alert('Sorry, having trouble with your cart right now');
     });
 }
 
@@ -202,12 +202,12 @@ function removeFromCart(productId) {
         if (data.success) {
             updateCartDisplay(data);
         } else {
-            alert('Error removing item from cart: ' + data.error);
+            alert('Hmm, couldn\'t remove that item: ' + data.error);
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Error removing item from cart');
+        console.error('Oops! Something went wrong:', error);
+        alert('Sorry, having trouble with your cart right now');
     });
 }
 
@@ -225,12 +225,12 @@ function updateQuantity(productId, quantity) {
         if (data.success) {
             updateCartDisplay(data);
         } else {
-            alert('Error updating quantity: ' + data.error);
+            alert('Oops! Couldn\'t update the quantity: ' + data.error);
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Error updating quantity');
+        console.error('Hmm, something went wrong:', error);
+        alert('Sorry, having trouble with your cart right now');
     });
 }
 
@@ -242,7 +242,7 @@ function updateCartDisplay(data) {
     const totalElement = document.getElementById('total');
 
     if (!cartItems || !data.items) {
-        console.error('Cart elements or data not found');
+        console.error('Hmm, can\'t find your cart items');
         return;
     }
 
@@ -297,25 +297,25 @@ function updateCartDisplay(data) {
 function checkout(cardNumber, cardExpiry, cardCVV, billingAddress, paymentMethod) {
     // Validate all required fields
     if (!cardNumber || !cardExpiry || !cardCVV || !billingAddress || !paymentMethod) {
-        alert('Error: All fields are required. Please fill in all fields and try again.');
+        alert('Hey! You forgot to fill in some details. Please check all fields and try again.');
         return;
     }
 
     // Validate card number (must be 16 digits)
     if (!/^\d{16}$/.test(cardNumber)) {
-        alert('Error: Card number must be 16 digits.');
+        alert('Oops! Your card number needs to be 16 digits.');
         return;
     }
 
     // Validate CVV (must be 3 digits)
     if (!/^\d{3}$/.test(cardCVV)) {
-        alert('Error: CVV must be 3 digits.');
+        alert('Hey! Your CVV needs to be 3 digits.');
         return;
     }
 
     // Validate expiry date (MM/YY format)
     if (!/^(0[1-9]|1[0-2])\/([0-9]{2})$/.test(cardExpiry)) {
-        alert('Error: Expiry date must be in MM/YY format.');
+        alert('Oops! Your expiry date should be in MM/YY format.');
         return;
     }
 
@@ -327,19 +327,19 @@ function checkout(cardNumber, cardExpiry, cardCVV, billingAddress, paymentMethod
 
     if (parseInt(expiryYear) < currentYear || 
         (parseInt(expiryYear) === currentYear && parseInt(expiryMonth) < currentMonth)) {
-        alert('Error: Card has expired.');
+        alert('Oops! Looks like your card has expired.');
         return;
     }
 
     // Validate payment method
     if (!['credit', 'debit'].includes(paymentMethod)) {
-        alert('Error: Invalid payment method.');
+        alert('Hmm, that payment method doesn\'t look right.');
         return;
     }
 
     // Validate billing address
     if (billingAddress.trim().length < 10) {
-        alert('Error: Billing address must be at least 10 characters long.');
+        alert('Hey! Your billing address needs to be a bit longer.');
         return;
     }
     
@@ -353,7 +353,7 @@ function checkout(cardNumber, cardExpiry, cardCVV, billingAddress, paymentMethod
     formData.append('payment-method', paymentMethod);
     
     // Log form data for debugging
-    console.log('Form data being sent:');
+    console.log('Here\'s what we\'re sending to the server:');
     for (let pair of formData.entries()) {
         console.log(pair[0] + ': ' + pair[1]);
     }
@@ -363,21 +363,21 @@ function checkout(cardNumber, cardExpiry, cardCVV, billingAddress, paymentMethod
         body: formData
     })
     .then(response => {
-        console.log('Checkout response status:', response.status);
+        console.log('Server says:', response.status);
         return response.json();
     })
     .then(data => {
-        console.log('Checkout response:', data);
+        console.log('Here\'s what the server said:', data);
         if (data.success) {
-            alert('Order placed successfully!');
+            alert('Your order is on its way! 🎉');
             window.location.href = 'index.html';
         } else {
-            alert(data.message || 'Error processing checkout');
+            alert(data.message || 'Oops! Something went wrong with your order.');
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Error processing checkout');
+        console.error('Hmm, something went wrong:', error);
+        alert('Sorry, having trouble processing your order right now');
     });
 }
 
@@ -404,34 +404,34 @@ function clearValidationMessage(inputElement) {
 function validateCardNumber(cardNumber) {
     const regex = /^\d{16}$/;
     if (!cardNumber) {
-        return { isValid: false, message: 'Card number is required' };
+        return { isValid: false, message: 'Hey! We need your card number' };
     }
     if (!regex.test(cardNumber)) {
-        return { isValid: false, message: 'Card number must be exactly 16 digits' };
+        return { isValid: false, message: 'Oops! Card number needs to be 16 digits' };
     }
-    return { isValid: true, message: 'Valid card number' };
+    return { isValid: true, message: 'Card number looks good!' };
 }
 
 // Function to validate CVV
 function validateCVV(cvv) {
     const regex = /^\d{3}$/;
     if (!cvv) {
-        return { isValid: false, message: 'CVV is required' };
+        return { isValid: false, message: 'Hey! We need your CVV' };
     }
     if (!regex.test(cvv)) {
-        return { isValid: false, message: 'CVV must be exactly 3 digits' };
+        return { isValid: false, message: 'Oops! CVV needs to be 3 digits' };
     }
-    return { isValid: true, message: 'Valid CVV' };
+    return { isValid: true, message: 'CVV looks good!' };
 }
 
 // Function to validate expiry date
 function validateExpiry(expiry) {
     const regex = /^(0[1-9]|1[0-2])\/([0-9]{2})$/;
     if (!expiry) {
-        return { isValid: false, message: 'Expiry date is required' };
+        return { isValid: false, message: 'Hey! We need your card\'s expiry date' };
     }
     if (!regex.test(expiry)) {
-        return { isValid: false, message: 'Expiry date must be in MM/YY format' };
+        return { isValid: false, message: 'Oops! Expiry date should be in the MM/YY format' };
     }
 
     const [month, year] = expiry.split('/');
@@ -441,30 +441,30 @@ function validateExpiry(expiry) {
 
     if (parseInt(year) < currentYear || 
         (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
-        return { isValid: false, message: 'Card has expired' };
+        return { isValid: false, message: 'Oops! Your card has expired' };
     }
 
-    return { isValid: true, message: 'Valid expiry date' };
+    return { isValid: true, message: 'Expiry date looks good!' };
 }
 
 // Function to validate billing address
 function validateBillingAddress(address) {
     if (!address) {
-        return { isValid: false, message: 'Billing address is required' };
+        return { isValid: false, message: 'Hey! We need your billing address' };
     }
     if (address.trim().length < 10) {
-        return { isValid: false, message: 'Billing address must be at least 10 characters' };
+        return { isValid: false, message: 'Oops! Address needs to be longer' };
     }
-    return { isValid: true, message: 'Valid billing address' };
+    return { isValid: true, message: 'Address looks good!' };
 }
 
 // Function to validate payment method
 function validatePaymentMethod(method) {
     if (!method) {
-        return { isValid: false, message: 'Payment method is required' };
+        return { isValid: false, message: 'Hey! Choose a payment method' };
     }
     if (!['credit', 'debit'].includes(method)) {
-        return { isValid: false, message: 'Invalid payment method' };
+        return { isValid: false, message: 'Oops! That payment method isn\'t right' };
     }
-    return { isValid: true, message: 'Valid payment method' };
+    return { isValid: true, message: 'Payment method looks good!' };
 } 

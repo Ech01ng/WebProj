@@ -7,11 +7,7 @@ require_once 'config.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-/**
- * Log error messages to the server's error log
- * parameters:
- * string $message Error message to log
- */
+// Log error messages to the server's error log
 function logError($message) {
     error_log(date('Y-m-d H:i:s') . " - Cart Error: " . $message);
 }
@@ -75,13 +71,15 @@ function getCartContents($conn) {
         try {
             // Prepare SQL to get product details
             $stmt = $conn->prepare("SELECT product_id, name, price, image_url FROM products WHERE product_id = ?");
+            // Check if the statement was prepared successfully
             if (!$stmt) {
                 logError("Failed to prepare statement: " . $conn->error);
                 throw new Exception("Failed to prepare statement: " . $conn->error);
             }
             
-            // Execute query with product ID
+            // Bind the product ID to the statement
             $stmt->bind_param("i", $product_id);
+            // Execute the statement
             if (!$stmt->execute()) {
                 logError("Failed to execute statement: " . $stmt->error);
                 throw new Exception("Failed to execute statement: " . $stmt->error);

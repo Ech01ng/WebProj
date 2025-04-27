@@ -14,9 +14,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check if username exists
     $sql = "SELECT id FROM users WHERE username = ?";
     if($stmt = mysqli_prepare($conn, $sql)) {
+        // Bind the username to the statement
         mysqli_stmt_bind_param($stmt, "s", $username);
+        // Execute the statement
         if(mysqli_stmt_execute($stmt)) {
+            // Store the result
             mysqli_stmt_store_result($stmt);
+            // Check if the username is already taken
             if(mysqli_stmt_num_rows($stmt) > 0) {
                 $errors[] = "This username is already taken.";
             }
@@ -27,9 +31,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check if email exists
     $sql = "SELECT id FROM users WHERE email = ?";
     if($stmt = mysqli_prepare($conn, $sql)) {
+        // Bind the email to the statement
         mysqli_stmt_bind_param($stmt, "s", $email);
+        // Execute the statement
         if(mysqli_stmt_execute($stmt)) {
+            // Store the result
             mysqli_stmt_store_result($stmt);
+            // Check if the email is already registered
             if(mysqli_stmt_num_rows($stmt) > 0) {
                 $errors[] = "This email is already registered.";
             }
@@ -54,11 +62,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             mysqli_stmt_bind_param($stmt, "sss", $username, $email, $hashed_password);
             
             if(mysqli_stmt_execute($stmt)) {
+                // Close the statement
                 mysqli_stmt_close($stmt);
+                // Close the connection
                 mysqli_close($conn);
+                // Send a JSON response
                 echo json_encode([
                     'success' => true,
                     'message' => 'Registration successful',
+                    // Redirect to the login page has a parameter of register=success due to it not being able to redirect to the login without it (I think it has to do with the pop up notification)
                     'redirect' => 'login.html?register=success'
                 ]);
                 exit;
@@ -74,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         http_response_code(400);
         echo json_encode([
             'success' => false,
-            'errors' => $errors
+            'error' => $errors
         ]);
         exit;
     }

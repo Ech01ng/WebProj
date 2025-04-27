@@ -60,7 +60,7 @@ function handleLogin() {
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Validate input exists
         if (!isset($_POST["username"]) || !isset($_POST["password"])) {
-            echo json_encode(['success' => false, 'error' => 'Username and password are required']);
+            echo json_encode(['success' => false, 'error' => 'Username and password are required to login!']);
             exit;
         }
         
@@ -70,7 +70,7 @@ function handleLogin() {
         
         // Check if the username and password are empty
         if(empty($username) || empty($password)) {
-            echo json_encode(['success' => false, 'error' => 'Please enter both username and password']);
+            echo json_encode(['success' => false, 'error' => 'Please enter both username and password to login!']);
             exit;
         }
         
@@ -120,7 +120,7 @@ function handleLogin() {
                             }
                         }
                     } else {
-                        echo json_encode(['success' => false, 'error' => 'Invalid username or password']);
+                        echo json_encode(['success' => false, 'error' => 'Wrong username or password!']);
                         exit;
                     }
                 } else {
@@ -138,7 +138,7 @@ function handleLogin() {
         }
     }
     
-    echo json_encode(['success' => false, 'error' => 'Invalid request method']);
+    echo json_encode(['success' => false, 'error' => 'Invalid request method to login!']);
     exit;
 }
 

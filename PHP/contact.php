@@ -16,13 +16,13 @@ $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
 // Validate required fields
 if (!$name || !$email || !$subject || !$message) {
     http_response_code(400);
-    die(json_encode(['success' => false, 'message' => 'All fields are required']));
+    die(json_encode(['success' => false, 'message' => 'All fields are required to send a message!']));
 }
 
 // Validate email format
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     http_response_code(400);
-    die(json_encode(['success' => false, 'message' => 'Invalid email format']));
+    die(json_encode(['success' => false, 'message' => 'Invalid email format!']));
 }
 
 try {
@@ -33,11 +33,11 @@ try {
     if ($stmt->execute()) {
         $stmt->close();
         $conn->close();
-        die(json_encode(['success' => true, 'message' => 'Message sent successfully']));
+        die(json_encode(['success' => true, 'message' => 'Message has been sent successfully!']));
     } else {
         $stmt->close();
         $conn->close();
-        throw new Exception('Failed to send message');
+        throw new Exception('Failed to send your message');
     }
 } catch (Exception $e) {
     // Close the statement and connection

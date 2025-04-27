@@ -20,19 +20,19 @@ function checkUrlParams() {
 // Function to handle login form submission
 function handleLogin(event) {
     event.preventDefault();
-    console.log('Login form submitted');
+    console.log('Hey, someone\'s trying to log in!');
     
     const formData = new FormData(event.target);
     
     // Log the form data
-    console.log('Form data being sent:', {
+    console.log('Here\'s what they typed:', {
         username: formData.get('username'),
         passwordLength: formData.get('password') ? formData.get('password').length : 0
     });
 
     // Log the full URL we're sending to
     const loginUrl = 'PHP/login.php?action=login';
-    console.log('Sending request to:', window.location.origin + '/' + loginUrl);
+    console.log('Sending this info to:', window.location.origin + '/' + loginUrl);
     
     fetch(loginUrl, {
         method: 'POST',
@@ -40,19 +40,21 @@ function handleLogin(event) {
         credentials: 'include'
     })
     .then(response => {
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
+        console.log('Server says:', response.status);
+        console.log('Server headers:', response.headers);
         return response.text().then(text => {
             try {
                 return JSON.parse(text);
             } catch (e) {
-                console.error('Failed to parse response as JSON:', text);
-                throw new Error('Invalid JSON response from server');
+                console.error('Oops, server sent something weird:', text);
+                throw new Error('Server sent back something we can\'t understand');
             }
         });
     })
     .then(data => {
-        console.log('Login response data:', data);
+        // Log the server response
+        console.log('Server response:', data);
+        // Check if the login was successful
         if (data.success) {
             // Store login state
             localStorage.setItem('isLoggedIn', 'true');
@@ -64,30 +66,35 @@ function handleLogin(event) {
         }
     })
     .catch(error => {
-        console.error('Login error:', error);
-        alert('An error occurred during login. Please check your database connection.');
+        // Log the error
+        console.error('Something went wrong:', error);
+        // Show an alert
+        alert('Oops! Can\'t connect to the server right now. Try again later?');
     });
 }
 
 // Function to check login status and update UI
 function checkLoginStatus() {
-    console.log('Checking login status...');
+    console.log('Let\'s see if you\'re logged in...');
     const loginLink = document.getElementById('loginLink');
     const registerLink = document.getElementById('registerLink');
     const logoutLink = document.getElementById('logoutLink');
 
     if (!loginLink || !registerLink || !logoutLink) {
-        console.error('Navigation links not found. Login:', loginLink, 'Register:', registerLink, 'Logout:', logoutLink);
+        console.error('Hmm, can\'t find the navigation buttons. Login:', loginLink, 'Register:', registerLink, 'Logout:', logoutLink);
         return;
     }
 
+    // Fetch the login status from the server
     fetch('PHP/login.php?action=check', {
         credentials: 'include'
     })
     .then(response => {
+        // Check if the response is ok
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error('Server\'s not happy right now');
         }
+        // Parse the response as JSON
         return response.json();
     })
     .then(data => {
@@ -107,24 +114,26 @@ function checkLoginStatus() {
             }
             return;
         }
-        console.log('Login status response:', data);
+        console.log('Server says about your login:', data);
 
+        // Check if the user is logged in
         if (data.loggedin) {
-            console.log('User is logged in as:', data.username);
+            console.log(`Hey, you're logged in as ${data.username}!`);
             loginLink.style.display = 'none';
             registerLink.style.display = 'none';
             logoutLink.style.display = 'inline-block';
             localStorage.setItem('isLoggedIn', 'true');
         } else {
-            console.log('User is not logged in');
+            console.log('Nope, not logged in yet');
             loginLink.style.display = 'inline-block';
             registerLink.style.display = 'inline-block';
             logoutLink.style.display = 'none';
             localStorage.removeItem('isLoggedIn');
         }
     })
+    // Log any errors
     .catch(error => {
-        console.error('Error checking login status:', error);
+        console.error('Trouble checking if you\'re logged in:', error);
         // Don't fallback to localStorage, always check with server
         loginLink.style.display = 'inline-block';
         registerLink.style.display = 'inline-block';
@@ -144,20 +153,20 @@ function handleLogout(event) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log('Logout response:', data);
+        console.log('Bye! Server says:', data);
         localStorage.removeItem('isLoggedIn');
         checkLoginStatus(); // Check status after logout
         window.location.href = 'index.html';
     })
     .catch(error => {
-        console.error('Error during logout:', error);
-        alert('An error occurred during logout.');
+        console.error('Trouble logging out:', error);
+        alert('Hmm, having trouble logging you out. Try again?');
     });
 }
 
 // Add event listeners when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing login functionality');
+    console.log('Page loaded, getting ready to handle logins');
     
     // Only check URL params on the login page
     if (window.location.pathname.includes('login.html')) {
@@ -169,16 +178,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Setup login form if it exists
     const loginForm = document.querySelector('.form-style');
     if (loginForm) {
-        console.log('Login form found, adding submit listener');
+        console.log('Found the login form, ready to go!');
         loginForm.addEventListener('submit', handleLogin);
     } else {
-        console.log('No login form found on this page');
+        console.log('No login form here, must be on a different page');
     }
     
     // Setup logout link
     const logoutLink = document.getElementById('logoutLink');
     if (logoutLink) {
-        console.log('Logout link found, adding click listener');
+        console.log('Found the logout button, all set!');
         logoutLink.addEventListener('click', handleLogout);
     }
 });
