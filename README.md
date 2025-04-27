@@ -102,7 +102,11 @@ The website must contain
 
 ## Getting Started
 
-1. Set up a local web server (e.g., XAMPP)
-2. Import the SQL database
-3. Configure the database connection in PHP files (This should be the same as it currently is due to localhost)
-4. Access the website through your local server
+1. Set up a local web server (e.g., XAMPP).
+2. Import the SQL database.
+3. Configure the database connection in PHP files (This should be the same as it currently is due to localhost).
+4. Access the website through your local server.
+5. An account should already exist:
+
+- username: testuser, password: test123
+- It also already has an order so you can go to the orders tab.
