@@ -62,12 +62,18 @@ The website must contain
 - Product Management
   - Product listing page
   - Product details
+  - Product filtering
 - Shopping Cart
   - Add/remove items
   - Cart sidebar
   - Checkout process
 - Contact Management
   - Contact form
+  - Google maps Iframe (thought it would be funny)
+- Orders Page
+  - Edit billing address
+  - Cancel orders
+  - Only person logged in can see their own orders
 
 ## Project Structure
 
